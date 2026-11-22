@@ -1,0 +1,1317 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cómo avanzó la IA</title>
+<meta name="description" content="Línea temporal educativa del avance de la inteligencia artificial, de ChatGPT (2022) a hoy: no solo modelos más grandes, también post-entrenamiento, razonamiento, herramientas y agentes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue: #8da0fb;
+  --purple: #b88ff4;
+  --lilac: #e1e2fe;
+  --yellow: #fbc77a;
+  --cream: #fffaed;
+  --ink: #280b3c;
+  --ink-soft: rgb(40 11 60 / 0.72);
+  --ease-bubble: cubic-bezier(0.32, 0.94, 0.6, 1);
+  --header-h: 112px;
+  --footer-h: 74px;
+  --b: 140px;
+  font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--ink);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; }
+body {
+  background: linear-gradient(100deg, #8da0fb 0%, #b88ff4 18%, #f0a9c9 38%, #fbc77a 55%, #b8d8c8 72%, #8da0fb 88%, #b88ff4 100%);
+  background-size: 400% 100%;
+  background-position: 0% 50%;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; }
+a { color: inherit; }
+
+/* ---------- Parallax background ---------- */
+.bg { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+.bg-layer { position: absolute; top: 0; left: 0; height: 100%; will-change: transform; }
+.star { position: absolute; width: 4px; height: 4px; border-radius: 1px; background: #fff; opacity: .7; }
+.star.warm { background: var(--yellow); }
+.star.pink { background: #ff94b6; }
+.cloud { position: absolute; filter: drop-shadow(0 14px 18px rgb(40 11 60 / 0.10)); }
+.cloud svg { display: block; width: 100%; height: auto; }
+
+/* ---------- Header ---------- */
+header {
+  position: fixed; inset: 0 0 auto 0; z-index: 20;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+  padding: 18px 24px 0;
+  pointer-events: none;
+}
+header > * { pointer-events: auto; }
+.brand .eyebrow { font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; opacity: .8; }
+.brand h1 { margin: 2px 0 0; font-size: clamp(1.4rem, 2.6vw, 2.1rem); font-weight: 800; line-height: 1; letter-spacing: -.02em; }
+.controls { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.pill {
+  display: inline-flex; align-items: center; gap: .5rem;
+  border: 0; border-radius: 999px; padding: .7rem 1.2rem;
+  background: var(--cream); color: var(--ink); font-weight: 500; line-height: 1;
+  cursor: pointer; box-shadow: 0 6px 20px rgb(40 11 60 / 0.10);
+  transition: transform .3s var(--ease-bubble), background-color .3s;
+}
+.pill:hover { transform: scale(1.04); background: var(--lilac); }
+.pill:focus-visible, .bubble:focus-visible, .chip:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.pill[aria-pressed="true"] { background: var(--ink); color: var(--cream); }
+
+.legend {
+  position: fixed; z-index: 20; left: 24px; right: 24px; top: 70px;
+  display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 4px 2px;
+}
+.legend::-webkit-scrollbar { display: none; }
+.chip {
+  flex: none; display: inline-flex; align-items: center; gap: 6px;
+  border: 0; border-radius: 999px; padding: .38rem .8rem .38rem .45rem;
+  background: rgb(255 250 237 / 0.78); backdrop-filter: blur(6px);
+  font-size: .82rem; font-weight: 500; cursor: pointer; white-space: nowrap;
+  transition: background-color .25s, opacity .25s, transform .25s var(--ease-bubble);
+}
+.chip:hover { transform: translateY(-1px); background: var(--cream); }
+.chip .dot { width: 18px; height: 18px; border-radius: 50%; background: var(--c); display: grid; place-items: center; }
+.chip .dot svg { width: 12px; height: 12px; stroke: #fff; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--cream); }
+.legend.filtering .chip[aria-pressed="false"] { opacity: .6; }
+
+/* ---------- Horizontal scroller ---------- */
+#scroller {
+  position: fixed; inset: 0; z-index: 5;
+  overflow-x: auto; overflow-y: hidden;
+  scrollbar-width: none; cursor: grab;
+  overscroll-behavior-x: contain;
+}
+#scroller::-webkit-scrollbar { display: none; }
+#scroller.dragging { cursor: grabbing; user-select: none; }
+#track { position: relative; height: 100%; }
+#line-svg { position: absolute; top: 0; left: 0; pointer-events: none; overflow: visible; }
+
+.year-ghost {
+  position: absolute; font-weight: 800; letter-spacing: -.04em; line-height: 1;
+  color: rgb(255 255 255 / 0.28); pointer-events: none; user-select: none;
+  transform: translate(-10%, -50%);
+}
+
+/* Intro and end panels */
+.panel {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgb(255 250 237 / 0.92); backdrop-filter: blur(10px);
+  border-radius: 28px; padding: 28px 30px; box-shadow: 0 20px 50px rgb(40 11 60 / 0.14);
+  cursor: auto;
+}
+.panel h2 { margin: 0 0 10px; font-size: clamp(1.6rem, 3vw, 2.4rem); line-height: 1.02; letter-spacing: -.02em; font-weight: 800; }
+.panel p { margin: 0 0 12px; line-height: 1.45; color: var(--ink-soft); }
+.panel .kicker { font-size: .75rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink); opacity: .7; margin-bottom: 8px; }
+.levers { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; margin: 14px 0 16px; padding: 0; list-style: none; }
+.levers li { display: flex; gap: 8px; align-items: flex-start; font-size: .86rem; line-height: 1.25; }
+.levers .dot { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--c); display: grid; place-items: center; margin-top: 1px; }
+.levers .dot svg { width: 13px; height: 13px; stroke: #fff; }
+.levers b { display: block; font-weight: 700; color: var(--ink); }
+.levers span { color: var(--ink-soft); }
+.hint { display: inline-flex; align-items: center; gap: 10px; font-weight: 500; font-size: .92rem; }
+.hint .arrow { display: inline-block; animation: nudge 1.6s ease-in-out infinite; }
+@keyframes nudge { 50% { transform: translateX(6px); } }
+.takeaways { margin: 8px 0 14px; padding-left: 1.1rem; line-height: 1.4; color: var(--ink-soft); }
+.takeaways li { margin-bottom: 6px; }
+.takeaways b { color: var(--ink); }
+.note { font-size: .8rem; opacity: .85; }
+
+/* Era cards */
+.era {
+  position: absolute; width: 300px; transform: translate(-50%, -50%);
+  background: var(--ink); color: var(--cream); border-radius: 24px; padding: 18px 20px;
+  box-shadow: 0 18px 40px rgb(40 11 60 / 0.25); cursor: auto;
+}
+.era .num { font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--yellow); }
+.era h3 { margin: 4px 0 6px; font-size: 1.35rem; line-height: 1.05; letter-spacing: -.01em; }
+.era .range { font-size: .8rem; opacity: .7; margin-bottom: 8px; }
+.era p { margin: 0; font-size: .88rem; line-height: 1.4; opacity: .9; }
+
+/* Milestone bubbles */
+.ms { position: absolute; width: 0; height: 0; }
+.bubble {
+  position: absolute; left: 0; top: 0; transform: translate(-50%, -50%);
+  width: var(--b); height: var(--b); padding: 0; border: 0; background: none; cursor: pointer;
+  border-radius: 50%;
+  transition: opacity .35s, filter .35s;
+}
+.orb {
+  position: absolute; inset: 0; border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 26%, rgb(255 255 255 / 0.95) 0 6%, rgb(255 255 255 / 0.35) 16%, transparent 36%),
+    radial-gradient(circle at 70% 78%, rgb(255 148 182 / 0.45) 0 10%, transparent 38%),
+    radial-gradient(circle at 50% 50%, var(--soft) 0 46%, color-mix(in srgb, var(--c) 32%, white) 74%, rgb(255 255 255 / 0.55) 100%);
+  box-shadow:
+    inset 0 0 0 2px rgb(255 255 255 / 0.55),
+    inset -12px -16px 30px rgb(255 148 182 / 0.30),
+    inset 12px 10px 30px rgb(141 160 251 / 0.30),
+    0 18px 38px rgb(40 11 60 / 0.16);
+  animation: bob var(--dur, 6s) ease-in-out var(--delay, 0s) infinite;
+  transition: transform .45s var(--ease-bubble), box-shadow .3s;
+}
+.orb::before {
+  content: ''; position: absolute; inset: -3px; border-radius: 50%; padding: 3px;
+  background: conic-gradient(from 210deg, #ff94b6, #fbc77a, #ffd333, #56c6a7, #8da0fb, #b88ff4, #ff0090, #ff94b6);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: .75;
+}
+.core {
+  position: absolute; inset: 22%; border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #fff, var(--cream) 70%);
+  display: grid; place-items: center;
+  box-shadow: 0 4px 14px rgb(40 11 60 / 0.10);
+}
+.core svg { width: 46%; height: 46%; stroke: var(--c-strong, var(--c)); }
+.bubble:hover .orb, .bubble:focus-visible .orb { transform: scale(1.08); }
+@keyframes bob { 0%, 100% { translate: 0 -5px; } 50% { translate: 0 5px; } }
+
+.label {
+  position: absolute; left: 0; transform: translateX(-50%);
+  width: max-content; max-width: 210px;
+  border-radius: 999px; padding: .45rem .9rem; text-align: center;
+  background: var(--cream); color: var(--ink);
+  font-size: .88rem; font-weight: 500; line-height: 1.15;
+  box-shadow: 0 6px 20px rgb(40 11 60 / 0.12);
+  pointer-events: none; transition: opacity .35s;
+}
+.label small { display: block; font-size: .72rem; opacity: .65; font-weight: 500; margin-top: 2px; }
+.label .sec { color: #b0006a; }
+.date-tag {
+  position: absolute; left: 0; transform: translate(-50%, 0);
+  font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  background: rgb(40 11 60 / 0.82); color: var(--cream); border-radius: 999px; padding: 3px 8px;
+  white-space: nowrap; pointer-events: none; transition: opacity .35s;
+}
+.dimmed .bubble, .dimmed .label, .dimmed .date-tag { opacity: .18; filter: grayscale(.6); }
+.dimmed .bubble { pointer-events: none; }
+
+.today {
+  position: absolute; transform: translate(-50%, -50%);
+  display: grid; place-items: center; pointer-events: none;
+}
+.today .pulse { width: 22px; height: 22px; border-radius: 50%; background: #ff0090; box-shadow: 0 0 0 0 rgb(255 0 144 / .5); animation: pulse 2s infinite; }
+.today span { position: absolute; top: 28px; white-space: nowrap; font-weight: 800; font-size: .9rem; background: var(--cream); padding: 4px 10px; border-radius: 999px; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 18px rgb(255 0 144 / 0); } 100% { box-shadow: 0 0 0 0 rgb(255 0 144 / 0); } }
+
+/* ---------- Minimap ---------- */
+.minimap {
+  position: fixed; z-index: 20; left: 24px; right: 24px; bottom: 16px; height: 46px;
+  background: rgb(255 250 237 / 0.85); backdrop-filter: blur(8px);
+  border-radius: 999px; box-shadow: 0 6px 20px rgb(40 11 60 / 0.10);
+  display: flex; align-items: center; gap: 12px; padding: 0 8px 0 16px;
+}
+.mm-rail { position: relative; flex: 1; height: 100%; cursor: pointer; }
+.mm-line { position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: rgb(40 11 60 / 0.18); }
+.mm-dot { position: absolute; top: 50%; width: 7px; height: 7px; border-radius: 50%; transform: translate(-50%, -50%); background: var(--c); }
+.mm-year { position: absolute; top: 3px; transform: translateX(-50%); font-size: .66rem; font-weight: 700; opacity: .7; }
+.mm-thumb {
+  position: absolute; top: 7px; bottom: 7px; border-radius: 999px;
+  background: rgb(40 11 60 / 0.10); border: 2px solid var(--ink); pointer-events: none;
+}
+.mm-btn { width: 34px; height: 34px; padding: 0; justify-content: center; box-shadow: none; background: var(--lilac); flex: none; }
+
+/* ---------- Detail dialog ---------- */
+dialog {
+  border: 0; padding: 0; border-radius: 30px; width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px); overflow: auto;
+  background: var(--cream); color: var(--ink);
+  box-shadow: 0 30px 80px rgb(40 11 60 / 0.35);
+}
+dialog::backdrop { background: rgb(40 11 60 / 0.5); }
+/* While a dialog is open, freeze everything behind it so nothing repaints under the modal. */
+.modal-open .orb, .modal-open .hint .arrow, .modal-open .today .pulse { animation-play-state: paused; }
+.modal-open .chip, .modal-open .minimap, .modal-open .panel { backdrop-filter: none; }
+.modal-open #scroller { pointer-events: none; }
+dialog[open] { animation: pop .45s var(--ease-bubble); }
+dialog .pill:hover { transform: none; }
+@keyframes pop { from { opacity: 0; transform: translateY(16px) scale(.96); } }
+.d-head { display: flex; gap: 16px; align-items: center; padding: 24px 24px 8px; }
+.d-orb { position: relative; flex: none; width: 76px; height: 76px; }
+.d-orb .orb { animation: none; }
+.d-meta { font-size: .8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
+.d-head h2 { margin: 2px 0 0; font-size: 1.55rem; line-height: 1.05; letter-spacing: -.01em; }
+.d-body { padding: 8px 24px 24px; }
+.d-layer { display: inline-flex; align-items: center; gap: 6px; padding: .3rem .7rem .3rem .35rem; border-radius: 999px; background: var(--soft); font-size: .82rem; font-weight: 700; margin: 6px 0 12px; }
+.d-layer .dot { width: 18px; height: 18px; border-radius: 50%; background: var(--c); display: grid; place-items: center; }
+.d-layer .dot svg { width: 11px; height: 11px; stroke: #fff; }
+.d-body h4 { margin: 14px 0 4px; font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; opacity: .65; }
+.d-body p { margin: 0; line-height: 1.5; }
+.d-num { margin-top: 14px; padding: 12px 14px; border-radius: 16px; background: var(--lilac); font-weight: 500; line-height: 1.35; }
+.d-num b { display: block; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; opacity: .65; margin-bottom: 2px; }
+.d-src { margin-top: 14px; font-size: .85rem; word-break: break-word; }
+.d-warn { margin-top: 10px; font-size: .8rem; padding: 8px 12px; border-radius: 12px; background: #ffe3ec; color: #7a0040; }
+.d-nav { display: flex; justify-content: space-between; gap: 8px; padding: 0 24px 24px; }
+.d-close { position: absolute; top: 14px; right: 14px; width: 38px; height: 38px; padding: 0; justify-content: center; background: var(--lilac); box-shadow: none; }
+
+.state-mini { display: inline-block; margin-top: 4px; padding: 1px 7px; border-radius: 999px; font-size: .66rem; font-weight: 700; background: var(--ss); color: var(--sc); }
+.d-ej { margin: 4px 0 0; padding: 12px 14px; border-radius: 14px; background: var(--ink); color: #f3eaff; font: 500 .78rem/1.5 ui-monospace, 'SF Mono', Menlo, Consolas, monospace; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+.d-state { margin-top: 12px; padding: 12px 14px; border-radius: 16px; background: var(--ss); line-height: 1.45; border-left: 4px solid var(--sc); }
+.d-state b { display: block; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--sc); margin-bottom: 3px; }
+.anatomy { margin: 14px 0 10px; display: grid; gap: 5px; }
+.an-row { display: flex; gap: 10px; align-items: baseline; padding: 8px 12px; border-radius: 12px; background: var(--soft); border-left: 5px solid var(--c); font-size: .86rem; line-height: 1.25; }
+.an-row b { flex: none; min-width: 9.5rem; color: var(--ink); }
+.an-row span { color: var(--ink-soft); }
+.an-product { background: var(--ink); border-left-color: var(--yellow); }
+.an-product b { color: var(--cream); }
+.an-product span { color: rgb(255 250 237 / .75); }
+.an-side { font-size: .8rem; color: var(--ink-soft); padding: 2px 4px; }
+.map { width: 100%; border-collapse: collapse; margin: 4px 0 14px; font-size: .86rem; }
+.map td { padding: 7px 8px; border-bottom: 1px solid rgb(40 11 60 / .1); vertical-align: top; line-height: 1.3; }
+.map td:first-child { color: var(--ink-soft); width: 52%; }
+.map td span { display: block; font-size: .74rem; color: var(--ink-soft); }
+.goto { border: 0; padding: 0 0 1px; background: none; font: inherit; font-weight: 700; color: var(--ink); cursor: pointer; border-bottom: 2px solid #3fb893; transition: color .2s, border-color .2s; }
+.map td span .goto { font-weight: 600; border-bottom-width: 1px; }
+.goto:hover { color: #1f8f6c; border-color: #1f8f6c; }
+.goto:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; border-radius: 3px; }
+.ms.flash .orb { animation: flash 1.2s ease-out; }
+@keyframes flash { 0% { transform: scale(1); } 30% { transform: scale(1.18); box-shadow: 0 0 0 10px rgb(255 250 237 / .7); } 100% { transform: scale(1); } }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Reduced motion ---------- */
+.reduce-motion .orb, .reduce-motion .hint .arrow, .reduce-motion .today .pulse { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .orb, .hint .arrow, .today .pulse { animation: none !important; }
+}
+
+/* ---------- Small screens ---------- */
+@media (max-width: 640px) {
+  :root { --header-h: 120px; --footer-h: 66px; }
+  header { padding: 14px 16px 0; }
+  .legend { left: 16px; right: 16px; top: 74px; }
+  .minimap { left: 16px; right: 16px; bottom: 12px; }
+  .controls .pill .txt { display: none; }
+  .levers { grid-template-columns: 1fr; }
+  .panel { padding: 22px 20px; }
+  .era { width: 250px; }
+  .label { max-width: 160px; font-size: .8rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg" aria-hidden="true">
+  <div class="bg-layer" id="bg-stars" data-speed="0.06"></div>
+  <div class="bg-layer" id="bg-far" data-speed="0.18"></div>
+  <div class="bg-layer" id="bg-near" data-speed="0.45"></div>
+</div>
+
+<header>
+  <div class="brand">
+    <div class="eyebrow">Ciencia de Datos e IA · iTec</div>
+    <h1>Cómo avanzó la IA</h1>
+  </div>
+  <div class="controls">
+    <button class="pill" id="btn-motion" aria-pressed="false" title="Reducir movimiento">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 12c2-4 4-4 6 0s4 4 6 0 4-4 6 0"/></svg>
+      <span class="txt">Reducir movimiento</span>
+    </button>
+  </div>
+</header>
+
+<nav class="legend" id="legend" aria-label="Filtrar por tipo de avance"></nav>
+
+<main id="scroller" tabindex="0" aria-label="Línea temporal. Usá la rueda, arrastrá o las flechas para recorrerla.">
+  <div id="track">
+    <svg id="line-svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="lineGrad" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0" stop-color="#8c00ff"/>
+          <stop offset=".35" stop-color="#ff0090"/>
+          <stop offset=".65" stop-color="#fbc77a"/>
+          <stop offset="1" stop-color="#56c6a7"/>
+        </linearGradient>
+        <clipPath id="progressClip"><rect id="progressRect" x="0" y="0" width="0" height="10000"/></clipPath>
+      </defs>
+      <g id="stems"></g>
+      <path id="line-base" fill="none" stroke="rgb(255 250 237 / 0.75)" stroke-width="6" stroke-linecap="round"/>
+      <path id="line-progress" fill="none" stroke="url(#lineGrad)" stroke-width="6" stroke-linecap="round" clip-path="url(#progressClip)"/>
+      <g id="dots"></g>
+    </svg>
+  </div>
+</main>
+
+<div class="minimap">
+  <div class="mm-rail" id="mm-rail" role="slider" aria-label="Posición en la línea temporal" aria-valuemin="2022" aria-valuemax="2026" tabindex="-1">
+    <div class="mm-line"></div>
+    <div class="mm-thumb" id="mm-thumb"></div>
+  </div>
+  <button class="pill mm-btn" id="mm-prev" aria-label="Hito anterior">‹</button>
+  <button class="pill mm-btn" id="mm-next" aria-label="Hito siguiente">›</button>
+</div>
+
+<dialog id="detail" aria-labelledby="d-title">
+  <button class="pill d-close" id="d-close" aria-label="Cerrar">✕</button>
+  <div class="d-head">
+    <div class="d-orb" id="d-orb"></div>
+    <div>
+      <div class="d-meta" id="d-meta"></div>
+      <h2 id="d-title"></h2>
+    </div>
+  </div>
+  <div class="d-body" id="d-body"></div>
+  <div class="d-nav">
+    <button class="pill" id="d-prev">‹ Anterior</button>
+    <button class="pill" id="d-next">Siguiente ›</button>
+  </div>
+</dialog>
+
+<script>
+/* ============================================================
+   Content
+   ============================================================ */
+const ICONS = {
+  chip: '<rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/>',
+  heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  bulb: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+  wrench: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>',
+  bolt: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+  scales: '<path d="M12 3v18M7 21h10M5 7h14M5 7l-3 6a3 3 0 0 0 6 0zM19 7l-3 6a3 3 0 0 0 6 0z"/>'
+};
+const svgIcon = (name, sw = 2) =>
+  `<svg viewBox="0 0 24 24" fill="none" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
+
+const LAYERS = {
+  escala:       { name: 'Escala y preentrenamiento', short: 'Escala', desc: 'Más parámetros, más datos y más cómputo al entrenar: lo que queda guardado en los pesos.', c: '#8c00ff', soft: '#ece0ff', icon: 'chip' },
+  post:         { name: 'Post-entrenamiento y alineación', short: 'Post-entrenamiento', desc: 'Ajustes posteriores para que el modelo siga instrucciones y se comporte bien.', c: '#ff5c96', soft: '#ffe3ec', icon: 'heart' },
+  sentidos:     { name: 'Sentidos y memoria de trabajo', short: 'Multimodal y contexto', desc: 'Qué puede percibir el modelo (texto, imagen, audio) y cuánto puede tener presente a la vez.', c: '#6f86f5', soft: '#e1e6ff', icon: 'eye' },
+  razonamiento: { name: 'Razonamiento en inferencia', short: 'Razonamiento', desc: 'Cómputo que se gasta al responder: dejar que el modelo piense antes de contestar.', c: '#f0b400', cs: '#c48a00', soft: '#fff3c4', icon: 'bulb' },
+  andamiaje:    { name: 'Harness y herramientas', short: 'Harness y herramientas', desc: 'Todo lo que rodea al modelo: contexto, herramientas, MCP, skills, hooks, subagentes.', c: '#3fb893', soft: '#d9f4ec', icon: 'wrench' },
+  eficiencia:   { name: 'Eficiencia y pesos abiertos', short: 'Eficiencia y apertura', desc: 'Hacer lo mismo con menos: arquitectura, destilación, caché y modelos abiertos.', c: '#e6007f', soft: '#ffd6ec', icon: 'bolt' },
+  sociedad:     { name: 'Medición, seguridad y reglas', short: 'Medición y reglas', desc: 'Cómo se mide el progreso, qué se restringe y cómo se regula.', c: '#5b3d7a', soft: '#ece4f4', icon: 'scales' }
+};
+
+/* Status of each concept as of November 2026. */
+const STATES = {
+  vigente:    { name: 'Vigente', c: '#1f8f6c', soft: '#d9f4ec' },
+  evoluciono: { name: 'Evolucionó', c: '#3f58d6', soft: '#e1e6ff' },
+  estandar:   { name: 'Ya es estándar', c: '#7a00dd', soft: '#ece0ff' },
+  debate:     { name: 'En debate', c: '#a86a00', soft: '#fff3c4' },
+  leccion:    { name: 'Lección histórica', c: '#5b3d7a', soft: '#ece4f4' }
+};
+
+const ERAS = [
+  { title: 'La era del chat', range: 'nov 2022 – dic 2023',
+    text: 'Se fijan los conceptos de base: tokens, roles, contexto, RAG y uso de herramientas. El gran salto no fue un modelo gigante, sino enseñarle a conversar.' },
+  { title: 'Más sentidos, más memoria', range: 'feb – ago 2024',
+    text: 'Los modelos ven, oyen y leen libros enteros. Aparecen las piezas que hacen viable usarlos como software: salidas estructuradas, modelos chicos y caché.' },
+  { title: 'Pensar antes de responder', range: 'sep 2024 – abr 2025',
+    text: 'Nuevo eje: el cómputo al responder. Y nace el harness: el programa que convierte un modelo en un agente que lee, edita y ejecuta.' },
+  { title: 'De responder a actuar', range: 'may – dic 2025',
+    text: 'Se arma la caja de herramientas del trabajo con agentes: ingeniería de contexto, hooks, subagentes, AGENTS.md, skills y herramientas bajo demanda.' },
+  { title: 'Doble uso y gobernanza', range: '2026',
+    text: 'Equipos de agentes, benchmarks que se saturan y capacidades tan potentes que algunas se restringen. El avance ya no se explica por una sola palanca.' }
+];
+
+/* Fields: que (qué es), como (cómo funciona), uso (en tu trabajo), ej (optional example),
+   state + hoy (status in nov 2026), num (key figure), src. conf: 'sec' = mostly secondary sources. */
+const MILESTONES = [
+  // ---- Era 0
+  { era: 0, d: '2022-03', t: 'RLHF: alinear con preferencias humanas', org: 'OpenAI (InstructGPT)', layer: 'post', state: 'evoluciono',
+    que: 'Una técnica para ajustar un modelo ya entrenado usando preferencias humanas: Reinforcement Learning from Human Feedback.',
+    como: 'Personas comparan pares de respuestas y eligen la mejor. Con esos votos se entrena un "modelo de recompensa", y luego el modelo de lenguaje se optimiza para conseguir más recompensa.',
+    uso: 'Explica por qué un modelo es amable, rechaza ciertos pedidos o tiene un estilo propio: eso no viene del preentrenamiento, se agregó después. Por eso dos versiones con conocimiento parecido pueden comportarse muy distinto.',
+    hoy: 'Se combina con feedback generado por IA (RLAIF), principios escritos (IA constitucional) y refuerzo con respuestas verificables.',
+    num: 'Un modelo de 1.300 millones de parámetros con RLHF fue preferido sobre GPT-3 de 175.000 millones.',
+    src: 'https://arxiv.org/abs/2203.02155' },
+  { era: 0, d: '2022-11-30', t: 'Tokens y la siguiente palabra', org: 'OpenAI (ChatGPT)', layer: 'escala', state: 'vigente',
+    que: 'Un modelo de lenguaje es una función que, dado un texto, predice el próximo token (un pedazo de palabra). ChatGPT puso esa idea en manos de todos.',
+    como: 'El texto se corta en tokens: una palabra suele ser entre 1 y 2 tokens. El modelo calcula probabilidades para el siguiente, elige uno, lo agrega y repite. No consulta una base de datos: genera.',
+    uso: 'Todo se mide en tokens: el costo de la API, el límite de contexto y la velocidad. Como genera texto plausible en lugar de buscar datos, puede inventar (alucinar), y su conocimiento termina en la fecha de corte de su entrenamiento.',
+    hoy: 'Sigue siendo el mecanismo de base de todos los modelos, aunque hoy se le sumen razonamiento y herramientas.',
+    num: 'Unos 100 millones de usuarios en dos meses (estimación de terceros).',
+    src: 'https://openai.com/index/chatgpt/' },
+  { era: 0, d: '2023-02-24', t: 'Pesos abiertos', org: 'Meta (LLaMA)', layer: 'eficiencia', state: 'vigente',
+    que: 'Modelos cuyos parámetros se pueden descargar y ejecutar en tu propia máquina o servidor.',
+    como: 'Los "pesos" son un archivo con miles de millones de números. Con herramientas como llama.cpp u Ollama, y con cuantización (guardar cada número con menos bits), un modelo de 7.000 millones de parámetros entra en una notebook.',
+    uso: 'Sirven cuando los datos no pueden salir de tu organización, cuando querés ajustar el modelo (fine-tuning) o evitar el costo por token. A cambio, el hardware y el mantenimiento corren por tu cuenta.',
+    hoy: 'Llama, Qwen, DeepSeek, Mistral y gpt-oss quedan a pocos meses de los modelos cerrados.',
+    num: 'LLaMA: de 7.000 a 65.000 millones de parámetros.',
+    src: 'https://ai.meta.com/blog/large-language-model-llama-meta-ai/' },
+  { era: 0, d: '2023-03-01', t: 'Roles y system prompt', org: 'OpenAI (Chat API)', layer: 'andamiaje', state: 'vigente',
+    que: 'La conversación se envía al modelo como una lista de mensajes con roles: system (instrucciones generales), user (lo que pide la persona) y assistant (lo que respondió el modelo).',
+    como: 'El modelo no recuerda nada entre llamadas: cada vez se le reenvía la conversación completa. El mensaje de sistema fija el comportamiento y va primero, porque el modelo fue entrenado para darle prioridad.',
+    uso: 'Es la primera capa de cualquier harness. Cuando configurás un asistente o un agente, en el fondo estás escribiendo su system prompt y decidiendo qué historial se reenvía.',
+    ej: `[
+  { "role": "system", "content": "Sos tutor de estadística. Respondé breve." },
+  { "role": "user", "content": "¿Qué es la mediana?" }
+]`,
+    hoy: 'Todas las APIs usan este formato. Los harness agregan encima memoria, herramientas y archivos de instrucciones.',
+    src: 'https://openai.com/index/introducing-chatgpt-and-whisper-apis/' },
+  { era: 0, d: '2023-03-14', t: 'Leyes de escala', org: 'OpenAI (GPT-4)', layer: 'escala', state: 'evoluciono',
+    que: 'La observación empírica de que el error de un modelo baja de forma predecible al aumentar parámetros, datos y cómputo de entrenamiento.',
+    como: 'OpenAI predijo el rendimiento de GPT-4 extrapolando desde modelos mucho más chicos. La mejora sigue una ley de potencia: cada salto requiere multiplicar el cómputo, no sumarlo.',
+    uso: 'Explica por qué los laboratorios construyen centros de datos gigantes y por qué cada generación cuesta mucho más que la anterior.',
+    hoy: 'Hoy hay dos ejes de escala: entrenar más y pensar más al responder (ver o1). Escalar solo el preentrenamiento rinde cada vez menos por dólar.',
+    num: 'GPT-4: alrededor del percentil 90 en el examen de abogacía de EE. UU., según OpenAI.',
+    src: 'https://openai.com/index/gpt-4-research/' },
+  { era: 0, d: '2023-03-23', t: 'RAG: buscar antes de responder', org: 'OpenAI y la comunidad', layer: 'andamiaje', state: 'evoluciono',
+    que: 'Retrieval-Augmented Generation: antes de responder, se buscan fragmentos relevantes en tus documentos y se agregan al contexto del modelo.',
+    como: 'Los documentos se cortan en pedazos y cada uno se convierte en un embedding: un vector que representa su significado. La pregunta también se convierte en vector, y se recuperan los pedazos más cercanos. El plugin de recuperación de ChatGPT popularizó el patrón.',
+    uso: 'Es la forma clásica de que un modelo responda sobre información privada o reciente sin reentrenarlo, y de que cite fuentes. Su calidad depende más de cómo cortás y buscás que del modelo.',
+    hoy: 'Los agentes de código suelen preferir la "búsqueda agéntica": el modelo usa grep, lee archivos y decide qué más buscar, sin base vectorial. El RAG con embeddings sigue siendo común en buscadores y chats sobre documentos.',
+    src: 'https://openai.com/index/chatgpt-plugins/' },
+  { era: 0, d: '2023-06-13', t: 'Tool use: cómo un modelo usa herramientas', org: 'OpenAI (function calling)', layer: 'andamiaje', state: 'vigente',
+    que: 'La capacidad de un modelo de pedir que se ejecute una función: buscar en la web, consultar una base de datos, correr código.',
+    como: 'Le describís las herramientas disponibles (nombre, descripción, parámetros). El modelo no ejecuta nada: responde con un pedido estructurado. Tu código lo ejecuta y le devuelve el resultado, y el ciclo se repite hasta que el modelo da su respuesta.',
+    uso: 'Es el mecanismo que hay debajo de todo agente, de MCP y de los harness. Si entendés este ciclo (pedido → ejecución → resultado), entendés cómo funciona un agente.',
+    ej: `// 1. El modelo responde con un pedido:
+{ "tool": "clima", "input": { "ciudad": "Río Cuarto" } }
+// 2. Tu código lo ejecuta y le devuelve:
+{ "tool_result": "18 °C, despejado" }
+// 3. El modelo sigue con ese dato.`,
+    hoy: 'Es la base de todo lo agéntico. Lo que cambió es cuántas herramientas puede manejar un modelo y quién las define.',
+    src: 'https://openai.com/index/function-calling-and-other-api-updates/' },
+  { era: 0, d: '2023-11-06', t: 'Ventana de contexto', org: 'OpenAI · Anthropic', layer: 'sentidos', state: 'vigente',
+    que: 'La cantidad máxima de tokens que el modelo puede considerar a la vez: instrucciones, historial, documentos y su propia respuesta.',
+    como: 'Funciona como memoria de trabajo: lo que no entra, no existe para el modelo. GPT-4 Turbo (128K) y Claude 2.1 (200K) la llevaron de unas páginas a un libro entero.',
+    uso: 'Que algo entre no significa que se use bien: los modelos rinden peor con información enterrada en el medio de mucho texto. Importa qué ponés en el contexto, no solo cuánto.',
+    hoy: 'Son comunes las ventanas de un millón de tokens, y gestionar el contexto (resumir, compactar, delegar) se volvió una disciplina.',
+    num: '200.000 tokens: unas 500 páginas.',
+    src: 'https://www.anthropic.com/news/claude-2-1' },
+  { era: 0, d: '2023-12-06', t: 'Multimodal nativo', org: 'Google (Gemini)', layer: 'sentidos', state: 'estandar',
+    que: 'Un modelo entrenado desde el inicio con texto, imágenes, audio y video, en lugar de un modelo de texto con un módulo de visión agregado.',
+    como: 'Las imágenes y el audio también se convierten en tokens, así que todo comparte la misma red y el mismo contexto.',
+    uso: 'Podés pasarle una captura de pantalla, un gráfico, la foto de un pizarrón o un PDF escaneado y razonar sobre eso directamente. Tené en cuenta que las imágenes también consumen tokens.',
+    hoy: 'Casi todos los modelos frontera aceptan imágenes, y muchos también audio y video.',
+    src: 'https://blog.google/technology/ai/google-gemini-ai/' },
+  { era: 0, d: '2023-12-11', t: 'Mixture of Experts (MoE)', org: 'Mistral AI (Mixtral)', layer: 'eficiencia', state: 'estandar',
+    que: 'Una arquitectura en la que el modelo tiene muchas subredes "expertas" pero usa solo unas pocas por cada token.',
+    como: 'Un enrutador elige qué expertos procesan cada token. Así el modelo tiene muchos parámetros (más conocimiento) pero gasta el cómputo de uno chico.',
+    uso: 'Explica por qué se citan dos números: parámetros totales y activos. Para correr un MoE localmente necesitás memoria para todos, aunque calcule con pocos.',
+    hoy: 'Es la arquitectura habitual de los modelos grandes abiertos (DeepSeek, Qwen, Llama 4).',
+    num: 'Mixtral: 46.700 millones de parámetros totales, unos 12.900 millones activos.',
+    src: 'https://mistral.ai/news/mixtral-of-experts/' },
+
+  // ---- Era 1
+  { era: 1, d: '2024-02-15', t: 'Un millón de tokens: ¿todo o buscar?', org: 'Google (Gemini 1.5)', layer: 'sentidos', state: 'debate',
+    que: 'Gemini 1.5 llevó la ventana de contexto a un millón de tokens: horas de video o un repositorio completo en una sola consulta.',
+    como: 'Combina MoE con mejoras en la atención. Se popularizó la prueba de la "aguja en el pajar": esconder un dato en un texto enorme y pedirle al modelo que lo encuentre.',
+    uso: 'Abre una decisión de diseño: ¿le paso todo al modelo o busco solo lo relevante (RAG)? Pasar todo es más simple; buscar es más barato, más rápido y suele ser más preciso.',
+    hoy: 'El contexto largo es común, pero pasar todo sigue siendo caro y diluye la atención. La mayoría de los sistemas combinan ambos.',
+    num: '1.000.000 de tokens (10 millones en investigación).',
+    src: 'https://blog.google/technology/ai/google-gemini-next-generation-model-february-2024/' },
+  { era: 1, d: '2024-02-15', t: 'Modelos de difusión', org: 'OpenAI (Sora)', layer: 'sentidos', state: 'vigente',
+    que: 'Otra familia de modelos generativos, usada para imagen y video, distinta de los modelos de lenguaje.',
+    como: 'Aprenden a quitar ruido: se parte de ruido aleatorio y, en muchos pasos, se lo va limpiando hasta obtener una imagen o un video coherente con el texto. Sora aplicó transformers a "parches" de video.',
+    uso: '"IA generativa" no es una sola técnica: el chat y la generación de imágenes funcionan distinto y tienen límites y costos distintos.',
+    hoy: 'Veo, Sora y otros generan video con audio sincronizado.',
+    src: 'https://openai.com/index/sora/' },
+  { era: 1, d: '2024-03-04', t: 'Familias por niveles', org: 'Anthropic (Claude 3)', layer: 'escala', state: 'vigente',
+    que: 'En vez de un solo modelo, una familia de tamaños: chico y rápido, medio, y grande y caro (Haiku, Sonnet, Opus).',
+    como: 'Comparten entrenamiento y estilo, pero cambian en costo, latencia y capacidad. En cada generación nueva, el tamaño medio suele alcanzar al grande de la anterior.',
+    uso: 'Elegir modelo es una decisión de ingeniería: tareas mecánicas (clasificar, extraer, explorar archivos) con el chico, decisiones difíciles con el grande. Muchos harness usan un modelo distinto para cada subtarea.',
+    hoy: 'Todas las empresas ofrecen familias por niveles, y los agentes combinan modelos según la tarea.',
+    src: 'https://www.anthropic.com/news/claude-3-family' },
+  { era: 1, d: '2024-04-18', t: 'Más datos, no más parámetros', org: 'Meta (Llama 3)', layer: 'escala', state: 'evoluciono',
+    que: 'Llama 3 mejoró sobre todo por entrenar con muchos más datos y de mejor calidad, sin grandes cambios de arquitectura.',
+    como: 'Entrenar un modelo chico con muchos más datos de lo "óptimo" encarece el entrenamiento pero abarata cada uso, porque el modelo es más chico al ejecutarse.',
+    uso: 'La calidad de los datos importa tanto como el tamaño. Vale también para vos: el modelo responde mejor sobre tu dominio si lo que le das es limpio y relevante.',
+    hoy: 'Los datos humanos de calidad escasean y crece el uso de datos sintéticos generados por otros modelos.',
+    num: 'Unos 15 billones de tokens de entrenamiento.',
+    src: 'https://ai.meta.com/blog/meta-llama-3/' },
+  { era: 1, d: '2024-05-13', t: 'Voz de punta a punta', org: 'OpenAI (GPT-4o)', layer: 'sentidos', state: 'estandar',
+    que: 'Un solo modelo que escucha audio y responde con audio, sin pasar por texto en el medio.',
+    como: 'Antes se encadenaban tres modelos (transcripción → texto → síntesis de voz), perdiendo entonación y sumando demora. GPT-4o procesa el audio como tokens propios.',
+    uso: 'Permite asistentes de voz que se pueden interrumpir y que captan tono y emoción, con una latencia parecida a la de una persona.',
+    hoy: 'Es la forma habitual de los asistentes de voz.',
+    num: 'Unos 320 ms de respuesta en promedio.',
+    src: 'https://openai.com/index/hello-gpt-4o/' },
+  { era: 1, d: '2024-07-18', t: 'Destilación', org: 'OpenAI (GPT-4o mini)', layer: 'eficiencia', state: 'vigente',
+    que: 'Entrenar un modelo chico para que imite las respuestas de uno grande.',
+    como: 'El modelo grande ("maestro") genera respuestas o probabilidades, y el chico ("alumno") aprende de ellas. Conserva buena parte de la capacidad por una fracción del costo.',
+    uso: 'Por eso los modelos chicos de hoy superan a los grandes de hace dos años. Para tareas de alto volumen, un modelo chico suele ser la decisión correcta.',
+    hoy: 'Es la vía principal para llevar capacidades a modelos baratos y a dispositivos.',
+    num: 'US$ 0,15 por millón de tokens de entrada.',
+    src: 'https://openai.com/index/gpt-4o-mini-advancing-cost-efficient-intelligence/' },
+  { era: 1, d: '2024-08-06', t: 'Salidas estructuradas', org: 'OpenAI', layer: 'andamiaje', state: 'estandar',
+    que: 'La garantía de que el modelo responde exactamente con el formato JSON que definiste.',
+    como: 'Le pasás un JSON Schema y, durante la generación, solo se permiten los tokens que mantienen válida la respuesta (decodificación restringida).',
+    uso: 'Es lo que permite usar un modelo como pieza de software: extraer datos de facturas, clasificar tickets o alimentar otra función sin interpretar texto libre.',
+    ej: `{ "type": "object",
+  "properties": {
+    "sentimiento": { "enum": ["positivo", "negativo", "neutro"] }
+  },
+  "required": ["sentimiento"] }`,
+    hoy: 'Las APIs principales lo ofrecen.',
+    src: 'https://openai.com/index/introducing-structured-outputs-in-the-api/' },
+  { era: 1, d: '2024-08-14', t: 'Prompt caching', org: 'Anthropic', layer: 'eficiencia', state: 'vigente',
+    que: 'Guardar el procesamiento del comienzo de un prompt para reutilizarlo en las llamadas siguientes.',
+    como: 'Si varias llamadas empiezan con el mismo prefijo (instrucciones, documentos, herramientas), ese tramo se procesa una vez; después se cobra mucho más barato y responde más rápido.',
+    uso: 'Es central en los agentes: como reenvían toda la conversación en cada paso, la caché es lo que los hace viables. Por eso conviene no cambiar el system prompt ni las herramientas a mitad de una sesión.',
+    hoy: 'Todos los proveedores lo ofrecen y los harness se diseñan alrededor de él.',
+    num: 'Hasta un 90% menos de costo en la parte cacheada, según Anthropic.',
+    src: 'https://www.anthropic.com/news/prompt-caching' },
+
+  // ---- Era 2
+  { era: 2, d: '2024-09-12', t: 'Razonamiento: pensar antes de responder', org: 'OpenAI (o1)', layer: 'razonamiento', state: 'estandar',
+    que: 'Modelos entrenados para generar una larga cadena de pensamiento antes de dar la respuesta final.',
+    como: 'Con aprendizaje por refuerzo, el modelo aprende a plantear, probar, detectar errores y corregirse en un texto interno. Cuantos más tokens de pensamiento, mejor rinde: es escalar el cómputo al responder (test-time compute).',
+    uso: 'Para matemática, código o planificación conviene que el modelo razone; para respuestas simples es tiempo y dinero desperdiciado. Los tokens de pensamiento también se pagan.',
+    hoy: 'Casi todos los modelos frontera razonan, y podés regular cuánto.',
+    num: 'Examen AIME 2024: de 12% (GPT-4o) a 74% (o1), según OpenAI.',
+    src: 'https://openai.com/index/learning-to-reason-with-llms/' },
+  { era: 2, d: '2024-10-22', t: 'Uso de la computadora', org: 'Anthropic (computer use)', layer: 'andamiaje', state: 'evoluciono',
+    que: 'Un modelo que opera una computadora mirando capturas de pantalla y moviendo el mouse y el teclado.',
+    como: 'El harness toma una captura, el modelo decide una acción ("clic en 340, 120", "escribí tal texto"), se ejecuta, se toma otra captura y se repite.',
+    uso: 'Permite automatizar programas que no tienen API. Es lento y frágil comparado con una API o una línea de comandos, así que conviene como último recurso.',
+    hoy: 'Los agentes usan herramientas directas (API, terminal, MCP) cuando existen, y la pantalla cuando no hay otra opción.',
+    num: 'OSWorld: 14,9% (el siguiente mejor sistema tenía 7,8%).',
+    src: 'https://www.anthropic.com/news/3-5-models-and-computer-use' },
+  { era: 2, d: '2024-11-25', t: 'MCP: un enchufe común para herramientas', org: 'Anthropic', layer: 'andamiaje', state: 'debate',
+    que: 'Model Context Protocol es un estándar abierto para conectar aplicaciones de IA con herramientas y datos externos: GitHub, una base de datos, Google Drive, un navegador.',
+    como: 'Hay dos lados. Un servidor MCP expone capacidades: herramientas (acciones), recursos (datos para leer) y prompts. Un cliente MCP (Claude Code, Cursor, ChatGPT, VS Code) se conecta, pregunta qué hay disponible y se lo ofrece al modelo como herramientas. Se comunican por la terminal local (stdio) o por HTTP.',
+    uso: 'Antes, cada aplicación programaba su propia integración con cada servicio (N aplicaciones × M servicios). Con MCP, alguien escribe un servidor una vez y funciona en cualquier cliente compatible: agregás una línea a tu configuración y tu agente puede leer issues, consultar tu base o manejar un navegador. Cuidado: cada servidor es código de terceros con acceso a tus datos, y lo que devuelve puede traer instrucciones maliciosas escondidas (prompt injection).',
+    ej: `// .mcp.json en la raíz del proyecto
+{
+  "mcpServers": {
+    "playwright": { "command": "npx", "args": ["@playwright/mcp@latest"] }
+  }
+}`,
+    hoy: 'Se donó a la Linux Foundation (dic 2025), hay más de 10.000 servidores, y la revisión de julio de 2026 lo hizo sin estado. La crítica principal: cargar las definiciones de muchas herramientas llena el contexto. Hoy se cargan bajo demanda, y para algunas tareas se prefiere que el agente use una CLI directamente.',
+    src: 'https://www.anthropic.com/news/model-context-protocol' },
+  { era: 2, d: '2024-12-20', t: 'Cuánto pensar: costo vs. calidad', org: 'OpenAI (o3)', layer: 'razonamiento', state: 'vigente',
+    que: 'o3 mostró que el mismo modelo rinde mucho más si lo dejás pensar más, pero el costo crece muy rápido.',
+    como: 'En ARC-AGI, la configuración de mucho cómputo generó muchísimos más tokens de pensamiento por tarea que la de poco cómputo, con un costo de miles de dólares en algunos casos.',
+    uso: 'Las APIs exponen un parámetro de esfuerzo (bajo, medio, alto). Elegirlo es parte del diseño: más esfuerzo para decisiones críticas, menos para tareas mecánicas.',
+    hoy: 'El esfuerzo es un parámetro más, como elegir el tamaño del modelo.',
+    num: 'ARC-AGI-1: 75,7% con poco cómputo y 87,5% con mucho.',
+    src: 'https://arcprize.org/blog/oai-o3-pub-breakthrough' },
+  { era: 2, d: '2025-01-20', t: 'Refuerzo con respuestas verificables', org: 'DeepSeek (R1)', layer: 'razonamiento', state: 'vigente',
+    que: 'DeepSeek-R1 publicó, con pesos abiertos, una receta para enseñar a razonar: premiar al modelo cuando llega a una respuesta que se puede comprobar.',
+    como: 'En matemática se compara con el resultado correcto; en programación se corren tests. Sin que nadie le muestre cómo pensar, el modelo descubre estrategias como revisar y corregirse.',
+    uso: 'Explica por qué los modelos mejoran más rápido en código y matemática que en tareas subjetivas: ahí es fácil verificar. Si tu tarea tiene una forma automática de chequear el resultado, un agente puede iterar solo hasta lograrlo.',
+    hoy: 'Es la técnica central para mejorar razonamiento y agentes.',
+    num: 'AIME 2024: 79,8%. Pesos con licencia MIT.',
+    src: 'https://arxiv.org/abs/2501.12948' },
+  { era: 2, d: '2025-02-02', t: 'Regulación por nivel de riesgo', org: 'Unión Europea (AI Act)', layer: 'sociedad', state: 'evoluciono',
+    que: 'El reglamento europeo de IA clasifica los usos por riesgo: prohibidos, de alto riesgo, con obligaciones de transparencia y de riesgo mínimo.',
+    como: 'Entró en vigor en agosto de 2024 y se aplica por etapas: prohibiciones desde febrero de 2025 y reglas para modelos de propósito general desde agosto de 2025.',
+    uso: 'Si desarrollás o usás IA con usuarios en Europa en áreas sensibles (selección de personal, crédito, educación), tenés obligaciones de documentación, supervisión humana y transparencia.',
+    hoy: 'El Digital Omnibus (julio de 2026) postergó las obligaciones de alto riesgo hasta diciembre de 2027.',
+    src: 'https://artificialintelligenceact.eu/implementation-timeline/' },
+  { era: 2, d: '2025-02-24', t: 'Razonamiento híbrido', org: 'Anthropic (Claude 3.7)', layer: 'razonamiento', state: 'evoluciono',
+    que: 'Un mismo modelo que puede responder al instante o pensar de forma extendida, según lo pidas.',
+    como: 'Claude 3.7 Sonnet permitió fijar un presupuesto de tokens de pensamiento por llamada. El razonamiento dejó de ser un modelo aparte y pasó a ser una perilla.',
+    uso: 'Un solo modelo para todo, regulando cuánto piensa en cada llamada según la dificultad.',
+    hoy: 'Ahora el modelo puede decidir solo cuánto pensar (pensamiento adaptativo), y vos fijás el esfuerzo máximo.',
+    src: 'https://www.anthropic.com/news/claude-3-7-sonnet' },
+  { era: 2, d: '2025-02-24', t: 'El harness: modelo + entorno', org: 'Anthropic (Claude Code)', layer: 'andamiaje', state: 'vigente',
+    que: 'El harness es el programa que envuelve al modelo y lo convierte en agente. Claude Code, Codex o Cursor son harness: el modelo puede ser el mismo, cambia todo lo que lo rodea.',
+    como: 'Corre un ciclo: arma el contexto (instrucciones, archivos, historial), le da herramientas (leer, editar, ejecutar comandos), ejecuta lo que el modelo pide, le muestra el resultado y repite hasta terminar. También gestiona permisos, memoria y compactación del contexto.',
+    uso: 'Explica por qué el mismo modelo rinde distinto en herramientas distintas. Cuando trabajás con un agente, buena parte de tu trabajo es configurar su harness: instrucciones, herramientas, permisos y verificaciones.',
+    hoy: 'En 2026 se habla de "harness engineering" como disciplina: agente = modelo + harness.',
+    src: 'https://www.anthropic.com/news/claude-3-7-sonnet' },
+  { era: 2, d: '2025-02-27', t: 'El límite de solo escalar', org: 'OpenAI (GPT-4.5)', layer: 'escala', state: 'leccion',
+    que: 'GPT-4.5 fue el último gran modelo de OpenAI mejorado casi solo con más preentrenamiento, sin razonamiento.',
+    como: 'Era muy grande y caro de servir, y su mejora (más conocimiento, mejor estilo) fue más sutil que la de los modelos que razonaban.',
+    uso: 'Un modelo más grande no es automáticamente mejor para tu tarea: hay que mirar costo, latencia y qué tipo de mejora trae.',
+    hoy: 'Se retiró de la API a los pocos meses.',
+    src: 'https://openai.com/index/introducing-gpt-4-5/' },
+  { era: 2, d: '2025-03-19', t: 'Horizonte de tareas', org: 'METR', layer: 'sociedad', state: 'vigente',
+    que: 'Una forma de medir el progreso: qué tan larga (en tiempo humano) es la tarea que un agente completa con un 50% de éxito.',
+    como: 'METR tomó tareas de software que a una persona le llevan desde segundos hasta horas y midió hasta qué largo de tarea llega cada modelo.',
+    uso: 'Ayuda a calibrar qué delegar: las tareas cortas y bien definidas salen bien; las largas y ambiguas conviene partirlas y supervisarlas.',
+    hoy: 'Es una de las métricas más citadas para seguir el avance de los agentes.',
+    num: 'El horizonte se duplicaba aproximadamente cada 7 meses (2019–2025).',
+    src: 'https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/' },
+  { era: 2, d: '2025-04-09', t: 'A2A: agentes que hablan con agentes', org: 'Google', layer: 'andamiaje', state: 'vigente',
+    que: 'Agent2Agent es un protocolo para que agentes de distintos proveedores se descubran, se deleguen tareas y se pasen resultados.',
+    como: 'Cada agente publica una "tarjeta" con lo que sabe hacer. Otro agente le envía una tarea y recibe avances y resultados.',
+    uso: 'La diferencia clave: MCP conecta un agente con herramientas; A2A conecta un agente con otro agente que tiene su propio criterio.',
+    hoy: 'Lo gestiona la Linux Foundation desde junio de 2025.',
+    src: 'https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/' },
+  { era: 2, d: '2025-04-16', t: 'Pensar y actuar a la vez', org: 'OpenAI (o3)', layer: 'razonamiento', state: 'estandar',
+    que: 'Los modelos de razonamiento empiezan a usar herramientas dentro de su cadena de pensamiento.',
+    como: 'Mientras piensa, el modelo busca en la web, corre código o mira una imagen, y sigue razonando con el resultado (pensamiento intercalado).',
+    uso: 'Es lo que hace útil a un agente en tareas reales: verificar con datos en lugar de suponer.',
+    hoy: 'Es el comportamiento normal de los agentes.',
+    src: 'https://openai.com/index/introducing-o3-and-o4-mini/' },
+
+  // ---- Era 3
+  { era: 3, d: '2025-05-16', t: 'Agentes de código', org: 'OpenAI · Anthropic', layer: 'andamiaje', state: 'vigente',
+    que: 'Agentes que reciben una tarea de programación y trabajan solos: leen el repositorio, editan, corren tests y entregan un cambio para revisar.',
+    como: 'Codex (OpenAI) trabaja en una máquina en la nube y devuelve un pull request; Claude Code (Anthropic), disponible para todos desde mayo, trabaja en tu terminal. Ambos repiten el ciclo editar → probar → corregir.',
+    uso: 'Cambia el rol de quien programa: menos escribir, más especificar bien, revisar y verificar. Los tests pasan a ser la forma de decirle al agente qué es "correcto".',
+    hoy: 'Es el caso de uso agéntico más maduro.',
+    num: 'SWE-bench Verified: entre 72% y 73% con Claude 4.',
+    src: 'https://www.anthropic.com/news/claude-4' },
+  { era: 3, d: '2025-06', t: 'Ingeniería de contexto', org: 'Comunidad', layer: 'andamiaje', state: 'evoluciono',
+    que: 'El término que reemplazó a "prompt engineering": diseñar todo lo que el modelo ve, no solo la frase que escribís.',
+    como: 'Incluye qué instrucciones dar, qué documentos traer, qué herramientas exponer, qué historial conservar y cuándo resumirlo (compactar).',
+    uso: 'Muchos errores de un agente no son del modelo sino del contexto: le faltaba información, tenía demasiada o era contradictoria. Revisar el contexto es el primer paso para depurar.',
+    hoy: 'Se amplió hacia la "ingeniería del harness", que suma el entorno de ejecución, la verificación y la recuperación de errores.',
+    src: 'https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents' },
+  { era: 3, d: '2025-06-30', t: 'Hooks: reglas que siempre se cumplen', org: 'Anthropic (Claude Code)', layer: 'andamiaje', state: 'vigente',
+    que: 'Comandos que el harness ejecuta automáticamente en momentos fijos: antes de usar una herramienta, después de editar un archivo, al terminar.',
+    como: 'A diferencia de una instrucción en el prompt, que el modelo puede pasar por alto, un hook es código: si está configurado, corre siempre, y puede bloquear una acción.',
+    uso: 'Para lo que no puede depender de la memoria del modelo: formatear el código después de cada edición, impedir tocar archivos sensibles, correr tests antes de terminar.',
+    ej: `// .claude/settings.json: formatear después de cada edición
+{ "hooks": { "PostToolUse": [ {
+    "matcher": "Edit|Write",
+    "hooks": [ { "type": "command", "command": "npx prettier --write ." } ]
+} ] } }`,
+    hoy: 'Es la forma habitual de agregar control determinista a un agente.',
+    src: 'https://code.claude.com/docs/en/hooks' },
+  { era: 3, d: '2025-07', t: 'Subagentes: delegar para cuidar el contexto', org: 'Anthropic (Claude Code)', layer: 'andamiaje', state: 'vigente',
+    que: 'Agentes secundarios que el agente principal lanza para una subtarea, cada uno con su propio contexto limpio.',
+    como: 'El principal le pasa una consigna; el subagente explora, lee decenas de archivos o corre pruebas, y devuelve solo un resumen. Todo ese ruido no llena el contexto del principal.',
+    uso: 'Útil para investigar, revisar código o explorar un repositorio grande. También permite usar un modelo más barato para lo mecánico.',
+    hoy: 'Creció hacia equipos de agentes que trabajan en paralelo.',
+    src: 'https://code.claude.com/docs/en/sub-agents' },
+  { era: 3, d: '2025-08-07', t: 'El sistema elige cuánto pensar', org: 'OpenAI (GPT-5)', layer: 'razonamiento', state: 'vigente',
+    que: 'GPT-5 incorporó un enrutador que decide, para cada pregunta, si responder rápido o razonar a fondo.',
+    como: 'Un componente liviano analiza la consulta y la manda al modelo o modo adecuado. Para quien lo usa, parece un solo modelo. Dos días antes, OpenAI publicó gpt-oss, sus primeros pesos abiertos desde GPT-2.',
+    uso: '"El modelo" de una aplicación suele ser un sistema de varios modelos. Si los resultados varían mucho entre consultas parecidas, puede que se hayan elegido rutas distintas.',
+    hoy: 'El enrutamiento y el pensamiento adaptativo son comunes en los productos de consumo.',
+    src: 'https://openai.com/index/introducing-gpt-5/' },
+  { era: 3, d: '2025-08', t: 'AGENTS.md: las reglas del proyecto', org: 'OpenAI y otros', layer: 'andamiaje', state: 'vigente',
+    que: 'Un archivo de texto en la raíz del proyecto con lo que un agente necesita saber: cómo instalar, cómo correr los tests, convenciones, qué no tocar.',
+    como: 'El harness lo lee al empezar cada sesión y lo agrega al contexto. Es como un README escrito para agentes. Claude Code usa su equivalente, CLAUDE.md.',
+    uso: 'Es lo primero que conviene escribir al trabajar con agentes: evita repetir las mismas indicaciones y hace que distintos agentes sigan las mismas reglas. Mantenelo corto: todo lo que pongas ocupa contexto en cada sesión.',
+    ej: `# AGENTS.md
+- Instalar: npm install
+- Tests: npm test (deben pasar antes de terminar)
+- Estilo: TypeScript estricto, sin any
+- No modificar la carpeta /migrations`,
+    hoy: 'Forma parte de la Agentic AI Foundation, junto con MCP.',
+    src: 'https://agents.md/' },
+  { era: 3, d: '2025-09-29', t: 'El harness como librería', org: 'Anthropic (Agent SDK)', layer: 'andamiaje', state: 'vigente',
+    que: 'Claude Agent SDK pone el mismo motor de Claude Code a disposición para construir tus propios agentes.',
+    como: 'Trae resueltos el ciclo agéntico, las herramientas, los permisos, los subagentes y el manejo del contexto; vos definís el propósito y las herramientas propias.',
+    uso: 'Ya no hace falta programar el ciclo agéntico desde cero: se parte de un harness probado. OpenAI y Google tienen kits equivalentes.',
+    hoy: 'Es la forma habitual de construir agentes a medida.',
+    num: 'Claude Sonnet 4.5, lanzado ese día, sostuvo más de 30 horas de trabajo autónomo según Anthropic.',
+    src: 'https://www.anthropic.com/news/claude-sonnet-4-5' },
+  { era: 3, d: '2025-10-16', t: 'Skills: saber hacer bajo demanda', org: 'Anthropic', layer: 'andamiaje', state: 'vigente',
+    que: 'Una skill es una carpeta con un archivo SKILL.md que le enseña al agente a hacer algo específico: un procedimiento, el formato de un informe, cómo usar una herramienta interna. Puede incluir scripts y archivos de referencia.',
+    como: 'Usa divulgación progresiva: al iniciar, el agente solo ve el nombre y la descripción de cada skill (unas pocas palabras). Si la tarea lo requiere, lee el SKILL.md completo, y recién después los archivos extra. Así podés tener cientos de skills sin llenar el contexto.',
+    uso: 'MCP da acceso (conectarse a un sistema); una skill da saber hacer (cómo hacer bien una tarea). AGENTS.md se carga siempre; una skill, solo cuando es relevante. Es la forma de empaquetar el conocimiento de tu equipo para que cualquier agente lo use.',
+    ej: `---
+name: informe-mensual
+description: Arma el informe mensual de ventas. Usar cuando pidan el reporte del mes.
+---
+1. Leé data/ventas.csv
+2. Calculá totales por región con scripts/totales.py
+3. Completá la plantilla templates/informe.md`,
+    hoy: 'Se publicó como estándar abierto (dic 2025) y la adoptaron más de 40 productos, entre ellos Codex, GitHub Copilot y VS Code. Lo que cambia es para qué conviene: con modelos más capaces hacen falta menos skills genéricas, y el valor está en el conocimiento propio de tu organización. Cuidado con instalar skills de terceros: pueden traer scripts maliciosos.',
+    src: 'https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills' },
+  { era: 3, d: '2025-11-24', t: 'Herramientas bajo demanda', org: 'Anthropic', layer: 'andamiaje', state: 'vigente',
+    que: 'Técnicas para que un agente pueda tener cientos de herramientas sin cargarlas todas en el contexto.',
+    como: 'Con una herramienta de búsqueda de herramientas, el modelo encuentra la que necesita y recién ahí carga su definición. Con la llamada programática, escribe código que encadena varias herramientas y solo ve el resultado final.',
+    uso: 'Responde a la principal crítica a MCP: conectar muchos servidores podía ocupar buena parte del contexto antes de empezar a trabajar. Si tu agente anda lento o torpe, revisá cuántas herramientas tiene cargadas.',
+    hoy: 'La carga diferida es la práctica recomendada en los harness.',
+    num: 'Anthropic reportó definiciones de herramientas que ocupaban 134.000 tokens antes de optimizar.',
+    src: 'https://www.anthropic.com/engineering/advanced-tool-use' },
+
+  // ---- Era 4 (2026)
+  { era: 4, d: '2026-02-05', t: 'Equipos de agentes', org: 'Anthropic (Claude Opus 4.6)', layer: 'andamiaje', state: 'vigente', conf: 'sec',
+    que: 'Varios agentes trabajando en paralelo sobre partes de un mismo proyecto, coordinados por un orquestador.',
+    como: 'El orquestador divide el trabajo, asigna cada parte a un agente con su propio contexto, y después integra y verifica los resultados.',
+    uso: 'Sirve para trabajos grandes y separables. El desafío es el mismo que en un equipo humano: dividir bien, evitar que dos agentes editen lo mismo y verificar al final.',
+    hoy: 'Los harness actuales incluyen orquestación de varios agentes.',
+    src: 'https://en.wikipedia.org/wiki/Claude_(language_model)' },
+  { era: 4, d: '2026-03-25', t: 'Benchmarks que se saturan', org: 'ARC Prize (ARC-AGI-3)', layer: 'sociedad', state: 'vigente',
+    que: 'Un benchmark es una prueba estándar para comparar modelos. Cuando todos sacan casi 100%, deja de servir y aparece uno nuevo.',
+    como: 'ARC-AGI-3 usa entornos interactivos nuevos: hay que explorar, descubrir las reglas y planificar. Las personas los resuelven; al lanzarse, los modelos casi no.',
+    uso: 'Leé los benchmarks con cuidado: muchos los reporta el mismo laboratorio, y un buen puntaje no garantiza que el modelo sirva para tu tarea. Lo más confiable es probarlo con tus propios casos (evals).',
+    hoy: 'MMLU y GPQA están saturados; la atención se movió a tareas agénticas largas.',
+    num: 'Al lanzarse, el mejor modelo obtuvo menos de 1%.',
+    src: 'https://arcprize.org/media/ARC_AGI_3_Technical_Report.pdf' },
+  { era: 4, d: '2026-04-07', t: 'Doble uso: un modelo que no se libera', org: 'Anthropic (Mythos)', layer: 'sociedad', state: 'vigente',
+    que: 'Anthropic retuvo Claude Mythos por su capacidad para encontrar y explotar vulnerabilidades, y lo dio solo a socios que defienden software crítico (Project Glasswing).',
+    como: 'La misma capacidad sirve para atacar o para defender. El laboratorio evaluó el riesgo y eligió acceso restringido en lugar de publicación general.',
+    uso: 'Las capacidades de seguridad de los modelos ya son reales: también sirven para auditar tu propio código. Y el acceso a ciertos modelos depende de políticas de uso, no solo de pagar.',
+    hoy: 'Otros laboratorios también clasifican sus modelos por riesgo en ciberseguridad.',
+    num: 'Anthropic reportó miles de vulnerabilidades graves encontradas (dato del propio laboratorio).',
+    src: 'https://www.anthropic.com/glasswing' },
+  { era: 4, d: '2026-06-09', t: 'Salvaguardas como capa del sistema', org: 'Anthropic (Claude Fable 5)', layer: 'post', state: 'vigente', conf: 'sec',
+    que: 'Claude Fable 5 llevó capacidades de la clase Mythos al público, con controles que detectan pedidos de alto riesgo.',
+    como: 'Clasificadores revisan las solicitudes; las de alto riesgo (ciberataques, armas biológicas) se derivan a un modelo menos capaz o se rechazan.',
+    uso: 'La seguridad ya no está solo en el entrenamiento: también hay capas alrededor del modelo. Si un pedido legítimo es rechazado, puede ser un falso positivo de esa capa.',
+    hoy: 'Es un patrón habitual para liberar modelos muy capaces.',
+    src: 'https://en.wikipedia.org/wiki/Claude_(language_model)' },
+  { era: 4, d: '2026-09-04', t: '¿Sigue importando el tamaño?', org: 'OpenAI (GPT-6 Astra)', layer: 'escala', state: 'vigente',
+    que: 'GPT-6 Astra llegó con puntajes casi perfectos en pruebas de conocimiento, y OpenAI lo clasificó con riesgo "crítico" en ciberseguridad según su propio marco.',
+    como: 'Combina más escala, más razonamiento y más entrenamiento en tareas agénticas: el avance ya no se puede atribuir a una sola palanca.',
+    uso: 'Entre modelos frontera, la diferencia se nota menos en preguntas sueltas y más en tareas largas: cuánto avanza solo, cuánto se equivoca y cuánto cuesta.',
+    hoy: 'El preentrenamiento sigue sumando, pero combinado con todo lo demás.',
+    num: 'GPQA Diamond: 96% (reportado por OpenAI).',
+    src: 'https://openai.com/index/gpt-6-astra/' }
+];
+
+/* ============================================================
+   Helpers
+   ============================================================ */
+const MONTHS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+const fmtDate = (d, long = false) => {
+  const [y, m, day] = d.split('-');
+  const mon = MONTHS[+m - 1];
+  if (long && day) return `${+day} ${mon} ${y}`;
+  return `${mon} ${y}`;
+};
+const $ = (s) => document.querySelector(s);
+const el = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
+const layerVars = (L) => `--c:${L.c};--soft:${L.soft};--c-strong:${L.cs || L.c}`;
+const orbHTML = (L) => `<span class="orb"><span class="core">${svgIcon(L.icon, 2.2)}</span></span>`;
+const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+let reducedMotion = reducedMotionQuery.matches;
+
+/* ============================================================
+   Build DOM
+   ============================================================ */
+const scroller = $('#scroller');
+const track = $('#track');
+const lineSvg = $('#line-svg');
+const legend = $('#legend');
+
+// Legend chips (filter by layer)
+const chipAll = el('button', 'chip', '<span class="dot" style="--c:var(--ink)"></span>Todas');
+chipAll.setAttribute('aria-pressed', 'true');
+legend.appendChild(chipAll);
+const chips = {};
+for (const [key, L] of Object.entries(LAYERS)) {
+  const c = el('button', 'chip', `<span class="dot" style="--c:${L.c}">${svgIcon(L.icon, 2.6)}</span>${L.short}`);
+  c.setAttribute('aria-pressed', 'false');
+  c.title = L.desc;
+  c.dataset.layer = key;
+  legend.appendChild(c);
+  chips[key] = c;
+}
+
+// Intro panel
+const intro = el('section', 'panel');
+intro.innerHTML = `
+  <div class="kicker">De ChatGPT (2022) a hoy · para quien trabaja con IA</div>
+  <h2>Los conceptos que hacen avanzar a la IA</h2>
+  <p>Cuando "sale un modelo mejor", el avance puede estar en capas muy distintas. Cada burbuja es un <b>concepto</b> que apareció en ese momento: qué es, cómo funciona, qué cambia en tu trabajo y si sigue vigente hoy.</p>
+  <div class="anatomy" aria-label="Capas de un sistema de IA">
+    <div class="an-row an-product"><b>Producto</b><span>lo que usás: un chat, Claude Code, Cursor, una app</span></div>
+    <div class="an-row" style="--c:${LAYERS.andamiaje.c};--soft:${LAYERS.andamiaje.soft}"><b>Harness</b><span>contexto, herramientas, MCP, skills, hooks, subagentes</span></div>
+    <div class="an-row" style="--c:${LAYERS.razonamiento.c};--soft:${LAYERS.razonamiento.soft}"><b>Inferencia</b><span>cuánto piensa al responder (razonamiento, esfuerzo)</span></div>
+    <div class="an-row" style="--c:${LAYERS.post.c};--soft:${LAYERS.post.soft}"><b>Post-entrenamiento</b><span>cómo se comporta (RLHF, alineación, salvaguardas)</span></div>
+    <div class="an-row" style="--c:${LAYERS.escala.c};--soft:${LAYERS.escala.soft}"><b>Pesos</b><span>lo que aprendió al preentrenar (escala, datos)</span></div>
+    <div class="an-side">Atraviesan todas las capas: <b style="color:${LAYERS.sentidos.c}">sentidos y contexto</b> · <b style="color:${LAYERS.eficiencia.c}">eficiencia</b> · <b style="color:${LAYERS.sociedad.c}">medición y reglas</b></div>
+  </div>
+  <p class="note">Cada burbuja indica si el concepto está <b>vigente</b>, <b>evolucionó</b>, <b>ya es estándar</b>, está <b>en debate</b> o quedó como <b>lección histórica</b>.</p>
+  <div class="hint">Usá la rueda, arrastrá o las flechas <span class="arrow">→</span></div>`;
+track.appendChild(intro);
+
+// Era cards
+const eraEls = ERAS.map((e, i) => {
+  const n = el('section', 'era');
+  n.innerHTML = `<div class="num">Etapa ${i + 1}</div><h3>${e.title}</h3><div class="range">${e.range}</div><p>${e.text}</p>`;
+  track.appendChild(n);
+  return n;
+});
+
+// Milestones
+const msEls = MILESTONES.map((m, i) => {
+  const L = LAYERS[m.layer];
+  const wrap = el('div', 'ms');
+  wrap.dataset.layer = m.layer;
+  wrap.style.cssText = layerVars(L);
+  const btn = el('button', 'bubble', orbHTML(L));
+  btn.setAttribute('aria-label', `${fmtDate(m.d)}: ${m.t} (${m.org}). ${L.short}. Abrir detalle.`);
+  const orb = btn.querySelector('.orb');
+  orb.style.setProperty('--dur', (5 + (i * 7) % 4) + 's');
+  orb.style.setProperty('--delay', (-(i * 1.3) % 6) + 's');
+  btn.addEventListener('click', (ev) => { if (dragMoved) { ev.preventDefault(); return; } openDetail(i); });
+  btn.addEventListener('focus', () => centerOn(i, false));
+  const S = STATES[m.state];
+  const label = el('div', 'label', `${m.t}${m.conf === 'sec' ? '<span class="sec" title="Fuente secundaria"> *</span>' : ''}<small>${m.org}</small><span class="state-mini" style="--sc:${S.c};--ss:${S.soft}">${S.name}</span>`);
+  const tag = el('div', 'date-tag', fmtDate(m.d));
+  wrap.append(btn, label, tag);
+  track.appendChild(wrap);
+  return { wrap, btn, label, tag };
+});
+
+// End panel
+const endPanel = el('section', 'panel');
+endPanel.innerHTML = `
+  <div class="kicker">Hoy · noviembre de 2026</div>
+  <h2>Mapa para trabajar con agentes</h2>
+  <p>Todas estas piezas se configuran dentro de un <b>harness</b>: el programa que convierte al modelo en agente. Qué usar según lo que necesitás:</p>
+  <table class="map">
+    <tr><td>Elegir dónde y cómo trabaja el agente</td><td><button class="goto" data-goto="El harness:">Harness</button> (Claude Code, Codex, Cursor o tu propio <button class="goto" data-goto="El harness como">Agent SDK</button>)<span>une modelo, contexto, herramientas y permisos</span></td></tr>
+    <tr><td>Que el agente conozca las reglas del proyecto</td><td><button class="goto" data-goto="AGENTS.md">AGENTS.md / CLAUDE.md</button><span>se carga siempre: corto</span></td></tr>
+    <tr><td>Que sepa hacer un procedimiento específico</td><td><button class="goto" data-goto="Skills">Skill</button><span>se carga solo cuando hace falta</span></td></tr>
+    <tr><td>Que acceda a un sistema externo</td><td><button class="goto" data-goto="MCP">MCP</button> o una CLI<span>acceso, no saber hacer · <button class="goto" data-goto="Herramientas bajo demanda">cargar herramientas bajo demanda</button></span></td></tr>
+    <tr><td>Que algo se cumpla siempre, sin excepción</td><td><button class="goto" data-goto="Hooks">Hook</button><span>código, no instrucción</span></td></tr>
+    <tr><td>Que responda sobre tus documentos</td><td><button class="goto" data-goto="RAG">RAG</button> o búsqueda agéntica</td></tr>
+    <tr><td>Una tarea grande o mucha exploración</td><td><button class="goto" data-goto="Subagentes">Subagentes</button> o <button class="goto" data-goto="Equipos de agentes">equipos de agentes</button><span>cuidan el contexto principal</span></td></tr>
+    <tr><td>Bajar costo y demora</td><td><button class="goto" data-goto="Familias por niveles">Modelo chico</button>, <button class="goto" data-goto="Prompt caching">caché</button>, <button class="goto" data-goto="Cuánto pensar">menos esfuerzo</button></td></tr>
+    <tr><td>Saber si funciona</td><td>Tests y evals propios<span>no solo <button class="goto" data-goto="Benchmarks que se saturan">benchmarks</button></span></td></tr>
+  </table>
+  <ol class="takeaways">
+    <li><b>Hay dos formas de escalar:</b> al entrenar (pesos) y al responder (razonamiento).</li>
+    <li><b>Agente = modelo + harness.</b> Gran parte de lo que "puede hacer la IA" depende de lo que rodea al modelo, y eso lo configurás vos.</li>
+    <li><b>El contexto es el recurso escaso.</b> Skills, subagentes, caché y herramientas bajo demanda existen para administrarlo.</li>
+  </ol>
+  <p class="note">Sobre las fuentes: cada concepto enlaza una fuente. Los marcados con <b>*</b> (2026) se basan sobre todo en fuentes secundarias y conviene confirmarlos. Las cifras de benchmarks son, en general, reportadas por los propios laboratorios.</p>`;
+track.appendChild(endPanel);
+
+// Map links: travel to the concept's bubble, then open its detail.
+endPanel.addEventListener('click', (e) => {
+  const link = e.target.closest('.goto');
+  if (!link) return;
+  const i = MILESTONES.findIndex(m => m.t.startsWith(link.dataset.goto));
+  if (i < 0) return;
+  if (isDimmed(i)) setFilter(null);
+  centerOn(i);
+  const travel = reducedMotion ? 0 : Math.min(1400, 300 + Math.abs(positions[i] - scroller.scrollLeft) / 12);
+  setTimeout(() => {
+    msEls[i].wrap.classList.add('flash');
+    setTimeout(() => { msEls[i].wrap.classList.remove('flash'); openDetail(i); }, reducedMotion ? 0 : 650);
+  }, travel);
+});
+
+const todayEl = el('div', 'today', '<div class="pulse"></div><span>Hoy</span>');
+track.appendChild(todayEl);
+
+/* ============================================================
+   Background (parallax layers, low-poly clouds)
+   ============================================================ */
+function rand(seed) { // deterministic PRNG so the scene is stable across resizes
+  let s = seed >>> 0;
+  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+}
+const CLOUD_SHADES = ['#ffffff', '#fbf6fb', '#f4ecf6', '#efe4f1', '#fff4ee', '#f7eef3', '#ebe0ee'];
+function cloudSVG(r) {
+  // Three low-poly domes, each a fan of triangles with slightly different shades.
+  const domes = [
+    { cx: 70, cy: 70, rad: 42 }, { cx: 120, cy: 58, rad: 52 }, { cx: 172, cy: 72, rad: 38 }
+  ];
+  let polys = '';
+  for (const d of domes) {
+    const steps = 6;
+    const pts = [];
+    for (let k = 0; k <= steps; k++) {
+      const a = Math.PI + (k / steps) * Math.PI;
+      const jitter = 0.86 + r() * 0.22;
+      pts.push([d.cx + Math.cos(a) * d.rad * jitter, d.cy + Math.sin(a) * d.rad * jitter]);
+    }
+    const c = [d.cx + (r() - 0.5) * 10, d.cy + 2];
+    for (let k = 0; k < steps; k++) {
+      const shade = CLOUD_SHADES[Math.floor(r() * CLOUD_SHADES.length)];
+      polys += `<polygon points="${c.join(',')} ${pts[k].join(',')} ${pts[k + 1].join(',')}" fill="${shade}" stroke="${shade}" stroke-width=".6"/>`;
+    }
+  }
+  // base slab joining the domes, slightly shaded underside
+  polys = `<polygon points="30,74 210,74 196,88 52,88" fill="#e6d9ec"/><polygon points="32,74 44,48 80,32 120,10 160,18 200,46 210,74" fill="#f3ebf5"/>` + polys;
+  return `<svg viewBox="20 0 210 92" aria-hidden="true">${polys}</svg>`;
+}
+
+function buildBackground(trackW, vw, vh) {
+  const layers = document.querySelectorAll('.bg-layer');
+  layers.forEach((layer) => {
+    const speed = +layer.dataset.speed;
+    const w = vw + (trackW - vw) * speed + 40;
+    layer.style.width = w + 'px';
+    layer.innerHTML = '';
+    if (layer.id === 'bg-stars') {
+      const r = rand(7);
+      const n = Math.round(w * vh / 9000);
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < n; i++) {
+        const s = el('span', 'star' + (r() < .15 ? ' warm' : r() < .12 ? ' pink' : ''));
+        s.style.left = (r() * w) + 'px';
+        s.style.top = (r() * vh) + 'px';
+        const size = 2 + r() * 3;
+        s.style.width = s.style.height = size + 'px';
+        s.style.opacity = (.35 + r() * .55).toFixed(2);
+        frag.appendChild(s);
+      }
+      layer.appendChild(frag);
+    } else {
+      const near = layer.id === 'bg-near';
+      const r = rand(near ? 31 : 13);
+      const spacing = near ? 900 : 520;
+      for (let x = -100; x < w; x += spacing * (0.7 + r() * 0.6)) {
+        const c = el('div', 'cloud', cloudSVG(r));
+        const width = near ? 260 + r() * 160 : 140 + r() * 110;
+        c.style.width = width + 'px';
+        c.style.left = x + 'px';
+        const band = near ? [0.12, 0.78] : [0.08, 0.9];
+        c.style.top = (band[0] + r() * (band[1] - band[0])) * vh + 'px';
+        c.style.opacity = near ? 0.92 : 0.65;
+        layer.appendChild(c);
+      }
+    }
+  });
+}
+
+/* ============================================================
+   Layout
+   ============================================================ */
+let positions = [];   // x of each milestone
+let lineYAt = () => 0;
+let trackW = 0;
+
+function layout() {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const mobile = vw < 640;
+  const headerH = mobile ? 128 : 126;
+  const footerH = mobile ? 70 : 76;
+  const top = headerH, bottom = vh - footerH;
+  const avail = bottom - top;
+  const mid = top + avail / 2;
+  const b = Math.max(92, Math.min(mobile ? 112 : 148, avail * 0.2));
+  document.documentElement.style.setProperty('--b', b + 'px');
+  const off = Math.min(avail * 0.27, b * 1.25);   // bubble distance from line
+  const amp = Math.min(26, avail * 0.04);
+  const gap = mobile ? 200 : 250;
+  const eraW = mobile ? 300 : 380;
+
+  lineYAt = (x) => mid + amp * Math.sin(x / 420);
+
+  // Intro
+  const introW = Math.min(mobile ? vw - 32 : 640, vw - 32);
+  intro.style.width = introW + 'px';
+  intro.style.maxHeight = (avail - 8) + 'px';
+  intro.style.overflow = 'auto';
+  intro.style.left = (mobile ? 16 : Math.max(24, vw * 0.06)) + 'px';
+  intro.style.top = mid + 'px';
+  let x = parseFloat(intro.style.left) + introW + (mobile ? 120 : 200);
+
+  positions = [];
+  let lastEra = -1;
+  const eraX = [];
+  MILESTONES.forEach((m, i) => {
+    if (m.era !== lastEra) {
+      x += eraW / 2;
+      eraX[m.era] = x;
+      x += eraW / 2 + gap * 0.35;
+      lastEra = m.era;
+    }
+    positions.push(x);
+    x += gap;
+  });
+  const todayX = x + 20;
+  const endW = Math.min(mobile ? vw - 32 : 600, vw - 32);
+  const endLeft = todayX + (mobile ? 90 : 160);
+  trackW = endLeft + endW + Math.max(40, vw * 0.08);
+
+  track.style.width = trackW + 'px';
+  lineSvg.setAttribute('width', trackW);
+  lineSvg.setAttribute('height', vh);
+  lineSvg.style.width = trackW + 'px';
+  lineSvg.style.height = vh + 'px';
+
+  // Era cards
+  ERAS.forEach((_, i) => {
+    eraEls[i].style.left = eraX[i] + 'px';
+    eraEls[i].style.top = lineYAt(eraX[i]) + 'px';
+  });
+
+  // Milestones, stems, dots
+  const stems = $('#stems'); stems.innerHTML = '';
+  const dots = $('#dots'); dots.innerHTML = '';
+  let stemsHTML = '', dotsHTML = '';
+  MILESTONES.forEach((m, i) => {
+    const px = positions[i];
+    const ly = lineYAt(px);
+    const up = i % 2 === 0;
+    const by = up ? ly - off : ly + off;
+    const { wrap, label, tag } = msEls[i];
+    wrap.style.left = px + 'px';
+    wrap.style.top = by + 'px';
+    // label on the outer side of the bubble
+    if (up) { label.style.top = 'auto'; label.style.bottom = (b / 2 + 12) + 'px'; }
+    else { label.style.bottom = 'auto'; label.style.top = (b / 2 + 12) + 'px'; }
+    // date tag sits on the opposite side of the line
+    const tagOffset = up ? (ly - by) + 12 : (ly - by) - 34;
+    tag.style.top = tagOffset + 'px';
+    const L = LAYERS[m.layer];
+    const edge = up ? by + b / 2 : by - b / 2;
+    stemsHTML += `<line x1="${px}" y1="${edge}" x2="${px}" y2="${ly}" stroke="rgb(255 250 237 / .8)" stroke-width="2" stroke-dasharray="3 5" data-i="${i}"/>`;
+    dotsHTML += `<circle cx="${px}" cy="${ly}" r="7" fill="${L.c}" stroke="#fffaed" stroke-width="3" data-i="${i}"/>`;
+  });
+  stems.innerHTML = stemsHTML;
+  dots.innerHTML = dotsHTML;
+
+  // Path
+  let d = `M 0 ${lineYAt(0).toFixed(1)}`;
+  for (let px = 16; px <= todayX; px += 16) d += ` L ${px} ${lineYAt(px).toFixed(1)}`;
+  d += ` L ${todayX} ${lineYAt(todayX).toFixed(1)}`;
+  $('#line-base').setAttribute('d', d);
+  $('#line-progress').setAttribute('d', d);
+
+  // Today marker and end panel
+  todayEl.style.left = todayX + 'px';
+  todayEl.style.top = lineYAt(todayX) + 'px';
+  endPanel.style.width = endW + 'px';
+  endPanel.style.left = endLeft + 'px';
+  endPanel.style.top = mid + 'px';
+  endPanel.style.maxHeight = (avail - 8) + 'px';
+  endPanel.style.overflow = 'auto';
+
+  // Year ghosts in the track
+  document.querySelectorAll('.year-ghost').forEach(n => n.remove());
+  const yearFirst = {};
+  MILESTONES.forEach((m, i) => { const y = m.d.slice(0, 4); if (!(y in yearFirst)) yearFirst[y] = i; });
+  Object.entries(yearFirst).forEach(([y, i], k) => {
+    const g = el('div', 'year-ghost', y);
+    g.style.fontSize = Math.min(200, avail * 0.36) + 'px';
+    g.style.left = (positions[i] - gap * 0.3) + 'px';
+    g.style.top = (mid + (k % 2 === 0 ? avail * 0.25 : -avail * 0.25)) + 'px';
+    track.insertBefore(g, track.firstChild);
+  });
+
+  buildBackground(trackW, vw, vh);
+  buildMinimap(yearFirst);
+  update(true);
+}
+
+/* ============================================================
+   Minimap
+   ============================================================ */
+const rail = $('#mm-rail');
+const thumb = $('#mm-thumb');
+function buildMinimap(yearFirst) {
+  rail.querySelectorAll('.mm-dot, .mm-year').forEach(n => n.remove());
+  MILESTONES.forEach((m, i) => {
+    const dot = el('span', 'mm-dot');
+    dot.style.setProperty('--c', LAYERS[m.layer].c);
+    dot.style.left = (positions[i] / trackW * 100) + '%';
+    rail.appendChild(dot);
+  });
+  let lastPct = -10;
+  for (const [y, i] of Object.entries(yearFirst)) {
+    const pct = positions[i] / trackW * 100;
+    if (pct - lastPct < 5) continue; // avoid overlapping year labels
+    const t = el('span', 'mm-year', y);
+    t.style.left = pct + '%';
+    rail.appendChild(t);
+    lastPct = pct;
+  }
+}
+rail.addEventListener('click', (e) => {
+  const r = rail.getBoundingClientRect();
+  const ratio = (e.clientX - r.left) / r.width;
+  scrollToX(ratio * trackW - window.innerWidth / 2);
+});
+
+/* ============================================================
+   Scrolling: wheel -> horizontal, drag, keys, smooth easing
+   ============================================================ */
+let target = 0;
+let animating = false;
+const maxScroll = () => scroller.scrollWidth - scroller.clientWidth;
+const clamp = (v) => Math.max(0, Math.min(maxScroll(), v));
+
+function scrollToX(x) {
+  target = clamp(x);
+  if (reducedMotion) { scroller.scrollLeft = target; return; }
+  if (!animating) { animating = true; requestAnimationFrame(tick); }
+}
+function tick() {
+  const cur = scroller.scrollLeft;
+  const next = cur + (target - cur) * 0.12;
+  if (Math.abs(target - next) < 0.5) { scroller.scrollLeft = target; animating = false; return; }
+  scroller.scrollLeft = next;
+  requestAnimationFrame(tick);
+}
+
+scroller.addEventListener('wheel', (e) => {
+  if (e.ctrlKey) return; // let pinch-zoom through
+  const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+  const scale = e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? window.innerWidth : 1;
+  e.preventDefault();
+  scrollToX((animating ? target : scroller.scrollLeft) + delta * scale * 1.15);
+}, { passive: false });
+
+// Mouse drag (touch uses native horizontal scrolling)
+let dragStart = null, dragMoved = false;
+scroller.addEventListener('pointerdown', (e) => {
+  if (e.pointerType !== 'mouse' || e.button !== 0) return;
+  if (e.target.closest('.panel, .era')) return; // allow text selection in panels
+  dragStart = { x: e.clientX, left: scroller.scrollLeft };
+  dragMoved = false;
+});
+window.addEventListener('pointermove', (e) => {
+  if (!dragStart) return;
+  const dx = e.clientX - dragStart.x;
+  if (Math.abs(dx) > 5) { dragMoved = true; scroller.classList.add('dragging'); }
+  if (dragMoved) { animating = false; scroller.scrollLeft = dragStart.left - dx; target = scroller.scrollLeft; }
+});
+window.addEventListener('pointerup', () => {
+  if (!dragStart) return;
+  dragStart = null;
+  scroller.classList.remove('dragging');
+  setTimeout(() => { dragMoved = false; }, 0);
+});
+
+function currentIndex() {
+  const center = scroller.scrollLeft + window.innerWidth / 2;
+  let best = 0, bestD = Infinity;
+  positions.forEach((p, i) => { const d = Math.abs(p - center); if (d < bestD) { bestD = d; best = i; } });
+  return { index: best, dist: bestD };
+}
+function centerOn(i, smooth = true) {
+  const x = positions[i] - window.innerWidth / 2;
+  if (smooth) scrollToX(x); else { target = clamp(x); scroller.scrollLeft = target; }
+}
+function step(dir) {
+  const { index, dist } = currentIndex();
+  const visibleOrder = MILESTONES.map((_, i) => i).filter(i => !isDimmed(i));
+  if (!visibleOrder.length) return;
+  const center = scroller.scrollLeft + window.innerWidth / 2;
+  let nextI;
+  if (dir > 0) nextI = visibleOrder.find(i => positions[i] > center + 5);
+  else nextI = [...visibleOrder].reverse().find(i => positions[i] < center - 5);
+  if (nextI === undefined) {
+    if (dir > 0) scrollToX(maxScroll()); else scrollToX(0);
+    return;
+  }
+  centerOn(nextI);
+}
+$('#mm-prev').addEventListener('click', () => step(-1));
+$('#mm-next').addEventListener('click', () => step(1));
+window.addEventListener('keydown', (e) => {
+  if (detail.open) return;
+  if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); step(1); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); step(-1); }
+  else if (e.key === 'Home') { e.preventDefault(); scrollToX(0); }
+  else if (e.key === 'End') { e.preventDefault(); scrollToX(maxScroll()); }
+});
+
+/* ============================================================
+   Per-frame updates on scroll: parallax, progress line, minimap
+   ============================================================ */
+const bgLayers = [...document.querySelectorAll('.bg-layer')];
+let ticking = false;
+function update(force) {
+  const sl = scroller.scrollLeft;
+  const vw = window.innerWidth;
+  const progress = maxScroll() > 0 ? sl / maxScroll() : 0;
+  bgLayers.forEach(l => { l.style.transform = `translate3d(${-sl * +l.dataset.speed}px,0,0)`; });
+  document.body.style.backgroundPosition = `${progress * 100}% 50%`;
+  $('#progressRect').setAttribute('width', sl + vw * 0.5);
+  thumb.style.left = (sl / trackW * 100) + '%';
+  thumb.style.width = (vw / trackW * 100) + '%';
+  rail.setAttribute('aria-valuenow', String(2022 + Math.round(progress * 4)));
+  if (!animating && !dragStart && !force) target = sl;
+}
+scroller.addEventListener('scroll', () => {
+  if (ticking) return;
+  ticking = true;
+  requestAnimationFrame(() => { update(); ticking = false; });
+});
+
+/* ============================================================
+   Filter by layer
+   ============================================================ */
+let activeLayer = null;
+const isDimmed = (i) => activeLayer && MILESTONES[i].layer !== activeLayer;
+function setFilter(layer) {
+  activeLayer = layer;
+  chipAll.setAttribute('aria-pressed', String(!layer));
+  for (const [k, c] of Object.entries(chips)) c.setAttribute('aria-pressed', String(k === layer));
+  legend.classList.toggle('filtering', !!layer);
+  msEls.forEach((m, i) => {
+    const dim = isDimmed(i);
+    m.wrap.classList.toggle('dimmed', dim);
+    m.btn.tabIndex = dim ? -1 : 0;
+  });
+  document.querySelectorAll('#dots circle, #stems line').forEach(n => {
+    n.style.opacity = isDimmed(+n.dataset.i) ? .25 : 1;
+  });
+  document.querySelectorAll('.mm-dot').forEach((n, i) => { n.style.opacity = isDimmed(i) ? .2 : 1; });
+}
+chipAll.addEventListener('click', () => setFilter(null));
+for (const [k, c] of Object.entries(chips)) c.addEventListener('click', () => setFilter(activeLayer === k ? null : k));
+
+/* ============================================================
+   Detail dialog
+   ============================================================ */
+const detail = $('#detail');
+let openIndex = -1;
+function openDetail(i) {
+  openIndex = i;
+  const m = MILESTONES[i];
+  const L = LAYERS[m.layer];
+  detail.style.cssText = layerVars(L);
+  $('#d-orb').innerHTML = orbHTML(L);
+  $('#d-meta').textContent = `${fmtDate(m.d, true)} · ${m.org}`;
+  $('#d-title').textContent = m.t;
+  const host = (() => { try { return new URL(m.src).hostname.replace('www.', ''); } catch { return m.src; } })();
+  const S = STATES[m.state];
+  const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  $('#d-body').innerHTML = `
+    <span class="d-layer"><span class="dot">${svgIcon(L.icon, 2.6)}</span>${L.name}</span>
+    <h4>Qué es</h4><p>${m.que}</p>
+    <h4>Cómo funciona</h4><p>${m.como}</p>
+    <h4>En tu trabajo</h4><p>${m.uso}</p>
+    ${m.ej ? `<h4>Ejemplo</h4><pre class="d-ej"><code>${esc(m.ej)}</code></pre>` : ''}
+    ${m.num ? `<div class="d-num"><b>Dato clave</b>${m.num}</div>` : ''}
+    <div class="d-state" style="--sc:${S.c};--ss:${S.soft}"><b>Hoy (nov 2026) · ${S.name}</b>${m.hoy}</div>
+    <div class="d-src">Fuente: <a href="${m.src}" target="_blank" rel="noopener">${host}</a></div>
+    ${m.conf === 'sec' ? '<div class="d-warn">Hito basado sobre todo en fuentes secundarias (Wikipedia o trackers). Conviene confirmarlo con el anuncio oficial.</div>' : ''}`;
+  $('#d-prev').disabled = i === 0;
+  $('#d-next').disabled = i === MILESTONES.length - 1;
+  if (!detail.open) { document.documentElement.classList.add('modal-open'); detail.showModal(); }
+  centerOn(i);
+}
+$('#d-close').addEventListener('click', () => detail.close());
+$('#d-prev').addEventListener('click', () => openIndex > 0 && openDetail(openIndex - 1));
+$('#d-next').addEventListener('click', () => openIndex < MILESTONES.length - 1 && openDetail(openIndex + 1));
+detail.addEventListener('click', (e) => { if (e.target === detail) detail.close(); });
+detail.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' && openIndex < MILESTONES.length - 1) openDetail(openIndex + 1);
+  if (e.key === 'ArrowLeft' && openIndex > 0) openDetail(openIndex - 1);
+});
+detail.addEventListener('close', () => {
+  document.documentElement.classList.remove('modal-open');
+  msEls[openIndex]?.btn.focus({ preventScroll: true });
+});
+
+/* ============================================================
+   Reduced motion toggle
+   ============================================================ */
+const btnMotion = $('#btn-motion');
+function applyMotion() {
+  document.documentElement.classList.toggle('reduce-motion', reducedMotion);
+  btnMotion.setAttribute('aria-pressed', String(reducedMotion));
+}
+btnMotion.addEventListener('click', () => {
+  reducedMotion = !reducedMotion;
+  try { localStorage.setItem('ia-timeline-reduce-motion', reducedMotion ? '1' : '0'); } catch {}
+  applyMotion();
+});
+try {
+  const saved = localStorage.getItem('ia-timeline-reduce-motion');
+  if (saved !== null) reducedMotion = saved === '1';
+} catch {}
+applyMotion();
+
+/* ============================================================
+   Init
+   ============================================================ */
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const ratio = maxScroll() > 0 ? scroller.scrollLeft / maxScroll() : 0;
+    layout();
+    scroller.scrollLeft = target = ratio * maxScroll();
+    update(true);
+  }, 120);
+});
+layout();
+scroller.focus({ preventScroll: true });
+</script>
+</body>
+</html>
