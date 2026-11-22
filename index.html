@@ -39,11 +39,11 @@ a { color: inherit; }
    (fractional display scaling) drop composited layers for a frame on hover. */
 /* ---------- Parallax background ---------- */
 .bg { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
-.bg-layer { position: absolute; top: 0; left: 0; height: 100%; }
+.bg-layer { position: absolute; top: 0; left: 0; height: 100%; will-change: transform; }
 .star { position: absolute; width: 4px; height: 4px; border-radius: 1px; background: #fff; opacity: .7; }
 .star.warm { background: var(--yellow); }
 .star.pink { background: #ff94b6; }
-.cloud { position: absolute; }
+.cloud { position: absolute; filter: drop-shadow(0 14px 18px rgb(40 11 60 / 0.10)); }
 .cloud svg { display: block; width: 100%; height: auto; }
 
 /* ---------- Header ---------- */
@@ -231,12 +231,9 @@ dialog {
   box-shadow: 0 30px 80px rgb(40 11 60 / 0.35);
 }
 dialog::backdrop { background: rgb(40 11 60 / 0.55); }
-.modal-open .bg { visibility: hidden; }
 /* While a dialog is open, freeze everything behind it so nothing repaints under the modal. */
-.modal-open .orb, .modal-open .hint .arrow, .modal-open .today .pulse { animation-play-state: paused; }
 .modal-open #scroller { pointer-events: none; }
 dialog[open] { animation: pop .45s var(--ease-bubble); }
-dialog .pill:hover { transform: none; }
 @keyframes pop { from { opacity: 0; transform: translateY(16px) scale(.96); } }
 .d-head { display: flex; gap: 16px; align-items: center; padding: 24px 24px 8px; }
 .d-orb { position: relative; flex: none; width: 76px; height: 76px; }
@@ -912,8 +909,7 @@ function cloudSVG(r) {
   }
   // base slab joining the domes, slightly shaded underside
   polys = `<polygon points="30,74 210,74 196,88 52,88" fill="#e6d9ec"/><polygon points="32,74 44,48 80,32 120,10 160,18 200,46 210,74" fill="#f3ebf5"/>` + polys;
-  const shadow = '<ellipse cx="120" cy="90" rx="92" ry="5" fill="rgb(40 11 60 / 0.07)"/>';
-  return `<svg viewBox="20 0 210 98" aria-hidden="true">${shadow}${polys}</svg>`;
+  return `<svg viewBox="20 0 210 92" aria-hidden="true">${polys}</svg>`;
 }
 
 function buildBackground(trackW, vw, vh) {
@@ -1265,10 +1261,8 @@ function openDetail(i) {
     ${m.conf === 'sec' ? '<div class="d-warn">Hito basado sobre todo en fuentes secundarias (Wikipedia o trackers). Conviene confirmarlo con el anuncio oficial.</div>' : ''}`;
   $('#d-prev').disabled = i === 0;
   $('#d-next').disabled = i === MILESTONES.length - 1;
-  animating = false;
-  centerOn(i, false);
-  update(true);
   if (!detail.open) { document.documentElement.classList.add('modal-open'); detail.showModal(); }
+  centerOn(i);
 }
 $('#d-close').addEventListener('click', () => detail.close());
 $('#d-prev').addEventListener('click', () => openIndex > 0 && openDetail(openIndex - 1));
