@@ -35,6 +35,8 @@ body {
 button { font: inherit; color: inherit; }
 a { color: inherit; }
 
+/* No backdrop-filter anywhere: several blurred layers at once make Chrome on macOS
+   (fractional display scaling) drop composited layers for a frame on hover. */
 /* ---------- Parallax background ---------- */
 .bg { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
 .bg-layer { position: absolute; top: 0; left: 0; height: 100%; }
@@ -74,7 +76,7 @@ header > * { pointer-events: auto; }
 .chip {
   flex: none; display: inline-flex; align-items: center; gap: 6px;
   border: 0; border-radius: 999px; padding: .38rem .8rem .38rem .45rem;
-  background: rgb(255 250 237 / 0.78); backdrop-filter: blur(6px);
+  background: rgb(255 250 237 / 0.92);
   font-size: .82rem; font-weight: 500; cursor: pointer; white-space: nowrap;
   transition: background-color .25s, opacity .25s, transform .25s var(--ease-bubble);
 }
@@ -105,7 +107,7 @@ header > * { pointer-events: auto; }
 /* Intro and end panels */
 .panel {
   position: absolute; top: 50%; transform: translateY(-50%);
-  background: rgb(255 250 237 / 0.92); backdrop-filter: blur(10px);
+  background: rgb(255 250 237 / 0.97);
   border-radius: 28px; padding: 28px 30px; box-shadow: 0 20px 50px rgb(40 11 60 / 0.14);
   cursor: auto;
 }
@@ -207,7 +209,7 @@ header > * { pointer-events: auto; }
 /* ---------- Minimap ---------- */
 .minimap {
   position: fixed; z-index: 20; left: 24px; right: 24px; bottom: 16px; height: 46px;
-  background: rgb(255 250 237 / 0.85); backdrop-filter: blur(8px);
+  background: rgb(255 250 237 / 0.95);
   border-radius: 999px; box-shadow: 0 6px 20px rgb(40 11 60 / 0.10);
   display: flex; align-items: center; gap: 12px; padding: 0 8px 0 16px;
 }
@@ -232,7 +234,6 @@ dialog::backdrop { background: rgb(40 11 60 / 0.55); }
 .modal-open .bg { visibility: hidden; }
 /* While a dialog is open, freeze everything behind it so nothing repaints under the modal. */
 .modal-open .orb, .modal-open .hint .arrow, .modal-open .today .pulse { animation-play-state: paused; }
-.modal-open .chip, .modal-open .minimap, .modal-open .panel { backdrop-filter: none; }
 .modal-open #scroller { pointer-events: none; }
 dialog[open] { animation: pop .45s var(--ease-bubble); }
 dialog .pill:hover { transform: none; }
